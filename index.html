@@ -890,6 +890,8 @@ textarea.inp{min-height:110px;resize:vertical;line-height:1.6}
 .sgmodes button{border:2px solid #E4DCF9;background:#fff;border-radius:12px;padding:8px 0;font-family:inherit;font-weight:800;cursor:pointer;color:var(--ink)}
 .sgmodes button.on{background:#7B61C9;border-color:#7B61C9;color:#fff}
 .sghow{margin-top:8px;line-height:1.6}
+[hidden]{display:none!important}
+.cb.zh-on{background:#FFF1C9;border-color:#E8C877;color:#8A5A00}
 .cb.sing{background:#EFE9FF;border-color:#D5C8F7}
 /* ── ③ 借力使力・放鬆一下 ── */
 .calmov{background:radial-gradient(circle at 50% 40%,rgba(255,236,214,.97),rgba(255,196,160,.85))}
@@ -16633,7 +16635,7 @@ function chunkPanelHTML(x,o){
           '<button class="cb rec" data-a="rec" title="錄音">🎙️</button>'+
           '<button class="cb" data-a="mine" title="聽我的錄音"'+(RECS[key]?'':' disabled')+'>▶</button>'+
           '<button class="cb" data-a="ab" title="示範 → 我的，連續對比"'+(RECS[key]?'':' disabled')+'>🔁</button>'+
-          (zh?'<button class="cb" data-a="zh" title="顯示／隱藏中譯">中</button>':'')+
+          (zh?'<button class="cb'+(zhShow?' zh-on':'')+'" data-a="zh" title="中譯：顯示／隱藏" aria-label="顯示或隱藏中文翻譯" aria-pressed="'+zhShow+'">中</button>':'')+
           (k==="s"?'<button class="cb sing" data-a="sing" title="聽說唱・讀寫畫：跟著球球唱出來">🎼</button>':'')+
         '</div></div>';
     }).join("")+
@@ -16646,11 +16648,12 @@ function bindChunkPanel(root,onRec){
     p.querySelectorAll(".chr").forEach(r=>{
       const key=r.dataset.k, t=r.dataset.t;
       const btn=a=>r.querySelector('[data-a="'+a+'"]');
+      { const zb=btn("zh"), zz=r.querySelector(".chr-zh"); if(zb&&zz){zb.classList.toggle("zh-on",!zz.hidden); zb.setAttribute("aria-pressed",!zz.hidden); zb.title="中譯：顯示／隱藏";} }
       r.querySelectorAll(".cb").forEach(b=>b.onclick=()=>{
         const a=b.dataset.a;
         if(a==="say")speakThen(t,0.9);
         else if(a==="slow")speakThen(t,0.6);
-        else if(a==="zh"){const z=r.querySelector(".chr-zh"); if(z)z.hidden=!z.hidden;}
+        else if(a==="zh"){const z=r.querySelector(".chr-zh"); if(z){z.hidden=!z.hidden; b.classList.toggle("zh-on",!z.hidden); b.setAttribute("aria-pressed",!z.hidden);}}
         else if(a==="sing"){const z=r.querySelector(".chr-zh"); singOpen(t,z?z.textContent:"");}
         else if(a==="mine")playRec(key);
         else if(a==="ab"){r.classList.add("playing");speakThen(t,0.9,()=>setTimeout(()=>playRec(key,()=>r.classList.remove("playing")),250));}
