@@ -1040,6 +1040,85 @@ textarea.inp{min-height:110px;resize:vertical;line-height:1.6}
   .chpop{top:calc(env(safe-area-inset-top,0px) + 54px);bottom:auto;transform:translateY(-24px) scale(.96)}
   .chpop.on{transform:none}
 }
+/* ══ STAR 解題法 ══ */
+.sttabs{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 14px}
+.sttabs button{border:1px solid var(--cream2);background:var(--cream);border-radius:999px;padding:7px 14px;font:inherit;font-weight:800;font-size:.88rem;color:var(--ink);cursor:pointer}
+.sttabs button.on{background:var(--blue-deep);border-color:var(--blue-deep);color:#fff}
+.ststeps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:14px}
+.ststep{position:relative;border:0;background:#2E4B78;color:#fff;padding:12px 18px 12px 26px;font:inherit;text-align:left;cursor:pointer;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);margin-right:-8px;opacity:.72}
+.ststep:first-child{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%);padding-left:14px}
+.ststep:nth-child(1){background:#26456E}.ststep:nth-child(2){background:#3F72AF}.ststep:nth-child(3){background:#B7862C}.ststep:nth-child(4){background:#6A50B8}
+.ststep.on{opacity:1;box-shadow:inset 0 -4px 0 rgba(255,255,255,.55)}
+.ststep small{display:block;color:#FFE38A;font-weight:900;letter-spacing:.08em;font-size:.72rem}
+.ststep b{font-size:.9rem;line-height:1.35;display:block}
+.stwrap{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:18px;align-items:center}
+.stw{width:100%;max-width:300px;color:var(--ink);display:block;margin:0 auto}
+.stw .stq{cursor:pointer;outline:none}.stw .stq:focus-visible path{stroke:#000;stroke-width:3}
+.stw .stq path{transition:fill-opacity .2s}
+.stw .stq:hover path{fill-opacity:.6}.stw .stq.on:hover path{fill-opacity:1}
+.stL{font:900 38px Georgia,"Times New Roman",serif}.stZ{font-weight:900;font-size:15px}
+.stC{font-weight:900;font-size:20px;letter-spacing:.12em;fill:var(--ink)}.stC2{font-weight:800;font-size:12px;fill:#3F72AF}
+.stdesc{border-left:5px solid var(--k);background:var(--cream);border-radius:12px;padding:14px 16px}
+.stbig{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.stbig>span{font:900 2.6rem/1 Georgia,serif;color:var(--k)}
+.stbig b{font-size:1.2rem;display:block}.stbig small{color:var(--ink-soft);font-style:italic;font-weight:700}
+.stask{font-weight:800;margin:4px 0}
+.stuse{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.stuse>div{background:var(--cream);border:1px solid var(--cream2);border-radius:12px;padding:10px 12px}
+.stuse p{margin:4px 0 0;font-size:.86rem;color:var(--ink-soft)}
+.stchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.stchips button{border:1px solid var(--cream2);background:var(--paper);border-radius:10px;padding:6px 11px;font:inherit;font-weight:800;font-size:.86rem;cursor:pointer;color:var(--ink)}
+.stchips button.on{background:var(--orange-soft);border-color:var(--orange);color:#8A4A12}
+.sthead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 10px}.sthead h3{margin:0;font-size:1.1rem}
+.stgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stc{border-radius:12px;padding:10px 12px 10px 14px;border:1px solid var(--cream2);background:var(--paper);border-left-width:5px}
+.stc b{display:flex;align-items:center;gap:8px;font-size:.95rem}
+.stc b i{font:900 1.35rem/1 Georgia,serif;font-style:normal}
+.stc p,.stc ul{margin:4px 0 0;font-size:.9rem}.stc ul{padding-left:1.2em}
+.stc.s{border-left-color:#26456E}.stc.s i{color:#26456E}
+.stc.t{border-left-color:#3F72AF}.stc.t i{color:#3F72AF}
+.stc.a{border-left-color:#D9A441}.stc.a i{color:#B7862C}
+.stc.r{border-left-color:#7B61C9}.stc.r i{color:#6A50B8}
+.sttrap{margin-top:10px;background:#FFF4E5;border:1px solid #F3D19C;border-radius:10px;padding:8px 12px;font-size:.88rem}
+.stex{margin-top:14px;border:2px dashed var(--cream2);border-radius:14px;padding:12px 14px;background:var(--cream)}
+.stex-h{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.stex-h .btn{margin-left:auto}
+.stex-q{font-family:Georgia,"Times New Roman",serif;font-size:1rem;margin:8px 0;padding:8px 12px;background:var(--paper);border-radius:10px}
+.stex-q .count{font-family:"Noto Sans TC","PingFang TC",sans-serif;margin-top:4px}
+.stex-s{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.stex-s li{display:flex;gap:10px;align-items:flex-start;font-size:.9rem}
+.stex-s li>i{flex:0 0 28px;height:28px;border-radius:8px;color:#fff;font:900 1rem/28px Georgia,serif;text-align:center;font-style:normal}
+.stex-s li.s>i{background:#26456E}.stex-s li.t>i{background:#3F72AF}.stex-s li.a>i{background:#D9A441}.stex-s li.r>i{background:#7B61C9}
+.strt{border:1px solid var(--cream2);border-radius:12px;overflow:hidden;margin:8px 0 14px}
+.strt-r{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,42px) minmax(70px,1.2fr);gap:6px;align-items:center;padding:6px 10px;width:100%;border:0;border-top:1px solid var(--cream2);background:var(--paper);font:inherit;font-size:.88rem;text-align:left;color:var(--ink);cursor:pointer}
+.strt-r>span:nth-child(n+2):not(.strt-bar){text-align:center;color:var(--ink-soft)}
+.strt-hd{cursor:default;background:var(--cream);font-weight:800;border-top:0;font-size:.78rem;color:var(--ink-soft)}
+.strt-r.on{background:var(--blue-soft)}.strt-r:not(.strt-hd):hover{background:var(--cream)}.strt-r.on:hover{background:var(--blue-soft)}
+.strt-bar{display:flex;align-items:center;gap:6px}.strt-bar i{height:8px;border-radius:4px;background:#3F72AF;display:block;min-width:4px}.strt-bar em{font-style:normal;font-weight:800}
+.strt-sep{padding:4px 10px;background:var(--cream);font-size:.76rem;font-weight:800;color:var(--ink-soft);border-top:1px solid var(--cream2)}
+.stlist{margin-top:12px;display:grid;gap:6px}
+.stlist button{display:flex;gap:8px;align-items:flex-start;text-align:left;border:1px solid var(--cream2);background:var(--paper);border-radius:10px;padding:8px 10px;font:inherit;font-size:.88rem;cursor:pointer;color:var(--ink)}
+.stlist button:hover{border-color:var(--blue)}.stlist .tag{flex:0 0 auto}
+.stgame{max-width:720px}
+.stg-top{display:flex;justify-content:space-between;font-size:.88rem;color:var(--ink-soft);margin-bottom:8px}
+.stg-q{background:var(--blue-soft);border-radius:14px;padding:14px 16px}
+.stg-q p{font:1.12rem/1.5 Georgia,"Times New Roman",serif;margin:8px 0}.stg-q small{color:var(--ink-soft)}
+.stg-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.stg-opts button{border:1px solid var(--cream2);background:var(--paper);border-radius:12px;padding:10px 6px;font:inherit;font-weight:800;font-size:.88rem;cursor:pointer;color:var(--ink)}
+.stg-opts button.ok{background:var(--green-soft);border-color:var(--green)}.stg-opts button.bad{background:var(--pink-soft);border-color:var(--pink)}
+.stg-opts button:disabled{cursor:default}.stg-opts button:disabled:not(.ok):not(.bad){opacity:.5}
+.stg-fb{padding:10px 12px;border-radius:10px;margin-bottom:10px}.stg-fb.ok{background:var(--green-soft)}.stg-fb.bad{background:#FFF4E5}
+.stdet{margin:0 0 12px;border:1px solid #D5C8F7;background:#F7F4FE;border-radius:12px;padding:0 12px}
+.stdet summary{cursor:pointer;font-weight:800;padding:9px 0;color:#5A43A8}
+.stdet[open]{padding-bottom:12px}.stdet h4{margin:10px 0 6px}.stdet .btn{margin-top:10px}
+.sttag{margin-left:8px;border:1px solid #D5C8F7;background:#F7F4FE;color:#5A43A8;border-radius:999px;padding:1px 9px;font:inherit;font-size:.74rem;font-weight:800;cursor:pointer;vertical-align:middle;white-space:nowrap}
+.sttag.on{background:#6A50B8;color:#fff;border-color:#6A50B8}
+.stmini{margin:6px 0 10px;padding:10px;border-radius:12px;background:#F7F4FE;border:1px solid #E3DAFB}
+.stflash{animation:stfl 2.2s ease}
+@keyframes stfl{0%,60%{box-shadow:0 0 0 4px rgba(123,97,201,.45);border-radius:10px}100%{box-shadow:0 0 0 0 rgba(123,97,201,0)}}
+@media(max-width:720px){.stwrap{grid-template-columns:1fr}.stuse{grid-template-columns:1fr}.stg-opts{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.ststeps{grid-template-columns:1fr 1fr;gap:6px}.ststep,.ststep:first-child{clip-path:none;border-radius:10px;margin:0;padding:10px 12px}
+  .stgrid{grid-template-columns:1fr}.strt-r{grid-template-columns:minmax(0,1.5fr) repeat(3,30px) 56px;gap:4px;padding:6px 8px;font-size:.82rem}.stex-h .btn{margin-left:0}}
+@media print{.sttabs,.stex-h .btn{display:none}}
 
 </style>
 </head>
@@ -1244,7 +1323,7 @@ textarea.inp{min-height:110px;resize:vertical;line-height:1.6}
       <div class="l2"><b>發音、語流與練習節奏支援</b><span>補強「從聲音出發」與專注節奏</span>
         <p>氣流實驗室・發音健身房・張弛節奏・聽說唱讀寫畫・蒲公英氣流儀表板・動詞三態</p></div>
       <div class="l3"><b>考試銜接</b><span>把字連到真實試題與課程</span>
-        <p>歷屆學測（113–115）・大考雷達・闖關測驗・段考生存・國中銜接・英文口說一點通（外部連結）</p></div>
+        <p>歷屆學測（113–115）・STAR 解題法・大考雷達・闖關測驗・段考生存・國中銜接・英文口說一點通（外部連結）</p></div>
       <div class="l4"><b>動機鷹架</b><span>可以忽略或關閉，方法不依賴它們</span>
         <p>陪讀小幫手艾可・鼓勵小語與不定時跳出（可在「鼓勵小語」關閉）・積分與徽章・頭像・校園領地戰</p></div>
     </div>
@@ -1407,6 +1486,15 @@ textarea.inp{min-height:110px;resize:vertical;line-height:1.6}
     <h2>歷屆學測英文 <span class="tag">113・114・115 學年度</span></h2>
     <p class="lead">真實試題逐大題作答：詞彙、綜合測驗、文意選填、篇章結構、閱讀測驗、混合題，以及中譯英與作文。對答案後自動計分，答錯的單字自動進<b>錯題本</b>；文章裡每個字點一下就能查級數與中文。</p>
     <div id="pastBox"></div>
+  </div>
+</section>
+
+<!-- ========== STAR 解題法 ========== -->
+<section id="star" class="wide">
+  <div class="card" style="max-width:1000px;margin:0 auto 16px">
+    <h2>STAR 解題法 <span class="tag">學測英文題型拆解</span></h2>
+    <p class="lead">每一題都走四步：<b>S 情境</b>讀出發生什麼事 → <b>T 任務</b>判斷題目要你做什麼 → <b>A 行動</b>理解線索之間的關係 → <b>R 結果</b>選出答案並回代驗證。以下用 113–115 學測真題示範各大題與閱讀題型的解法。</p>
+    <div id="starBox"></div>
   </div>
 </section>
 
@@ -15109,13 +15197,13 @@ const PILLARS=[
  {id:"decode",ic:"🔤",nm:"SoR 解碼",pk:"#3F72AF",pks:"#DCE7F5",subs:["card","spell","prod","recv","roots","sort"],
    ext:[{nm:"英文口說一點通",ic:"🗣️",url:"https://intonation.formosaspeaks.com/",tip:"輸入英文，看發音、音高與語速（蕭博士語調研究）"}]},
  {id:"lab",ic:"🎙️",nm:"發音實驗室",pk:"#E86A8A",pks:"#FBDCE3",subs:["air","gym","shadow","dict","flow"]},
- {id:"exam",ic:"🎯",nm:"升學實戰",pk:"#E08A3C",pks:"#FBE7D3",subs:["radar","past","verbs","wrong","bridge","quiz","rev"]},
+ {id:"exam",ic:"🎯",nm:"升學實戰",pk:"#E08A3C",pks:"#FBE7D3",subs:["radar","past","star","verbs","wrong","bridge","quiz","rev"]},
  {id:"arena",ic:"🏆",nm:"競技場",pk:"#7B61C9",pks:"#E9E3F8",subs:["survive","turf","pass"]}
 ];
 const SUBNM={home:"總覽",method:"學習法",card:"色塊單字卡",spell:"拼字解碼",prod:"產出軌 L1–3",recv:"接收軌 L4–6",roots:"字根樹",sort:"三層分類・查字",
- air:"氣流實驗",gym:"發音健身房",shadow:"語塊跟讀",dict:"搭配詞聽寫",flow:"張弛節奏",radar:"大考雷達",past:"歷屆學測",verbs:"動詞三態",wrong:"錯題本",cheer:"鼓勵小語",design:"設計說明",bridge:"國中銜接",quiz:"闖關測驗",rev:"間隔複習",
+ air:"氣流實驗",gym:"發音健身房",shadow:"語塊跟讀",dict:"搭配詞聽寫",flow:"張弛節奏",radar:"大考雷達",past:"歷屆學測",star:"STAR 解題",verbs:"動詞三態",wrong:"錯題本",cheer:"鼓勵小語",design:"設計說明",bridge:"國中銜接",quiz:"闖關測驗",rev:"間隔複習",
  survive:"段考生存",turf:"校園領地戰",pass:"學習護照"};
-const NEWSUB=new Set(["card","spell","air","gym","shadow","verbs","wrong","cheer","radar","past","bridge","survive","turf"]);
+const NEWSUB=new Set(["card","spell","air","gym","shadow","verbs","wrong","cheer","radar","past","star","bridge","survive","turf"]);
 let curSec="home";
 function pillarOf(id){return PILLARS.find(p=>p.subs.includes(id))||PILLARS[0];}
 function drawNav(){
@@ -15161,6 +15249,7 @@ function go(id){
   if(id==="shadow")drawShadow();
   if(id==="radar")drawRadar();
   if(id==="past")drawPast();
+  if(id==="star")drawStar();
   if(typeof flowEdge==="function")flowEdge(id==="air"||id==="gym");
   if(id==="verbs")drawVerbs();
   if(id==="wrong"){if(wbView!=="review")wbS=null;drawWrong();}
@@ -15174,7 +15263,7 @@ function go(id){
 const PCARDS=[
  {to:"card",ic:"🔤",bg:"#DCE7F5",c:"#26456E",h:"SoR 解碼",p:"單字拆成聲音色塊，拖曳音素方塊拼出單字 — 聽音拼字、看字讀音；再連到「英文口說一點通」看整句的音高與語速。",go:"色塊單字卡・拼字解碼"},
  {to:"air",ic:"🎙️",bg:"#FBDCE3",c:"#B34460",h:"發音實驗室",p:"用麥克風「看見」氣流：送氣吹動風車、喉嚨震動亮燈；語音辨識聽錯時，提示可能跑掉的音與嘴型舌位。",go:"氣流實驗・發音健身房"},
- {to:"radar",ic:"🎯",bg:"#FBE7D3",c:"#8A4A12",h:"升學實戰",p:"歷屆學測（113–115）逐大題作答；查單字的大考定位、掃描試題文本；動詞三態按音型家族練到反射；另有國中銜接模式，讓剛升國中的學生從短字爬階梯到長單字。",go:"歷屆學測・大考雷達・動詞三態"},
+ {to:"radar",ic:"🎯",bg:"#FBE7D3",c:"#8A4A12",h:"升學實戰",p:"歷屆學測（113–115）逐大題作答，用 STAR 解題法拆解題型；查單字的大考定位、掃描試題文本；動詞三態按音型家族練到反射；另有國中銜接模式，讓剛升國中的學生從短字爬階梯到長單字。",go:"歷屆學測・大考雷達・動詞三態"},
  {to:"survive",ic:"🏆",bg:"#E9E3F8",c:"#4B3591",h:"競技場",p:"段考前兩週開放生存模式；積分為學校而戰，在台灣地圖上插旗。",go:"段考生存・領地戰"}
 ];
 function drawHomeExtras(){
@@ -17609,6 +17698,7 @@ function drawPast(){
 function pDrawSec(el,y,sec,st){
   const chk=st.chk[sec.id], s=pScoreSec(y,sec.id);
   let h='<div class="psh"><h3>'+esc(sec.title)+'</h3><span class="count">'+esc(sec.desc||"")+'</span></div>';
+  if(typeof starSecHint==="function")h+=starSecHint(sec.id);
   if(sec.id==="write")h+=pWriteHTML(y,sec,st);
   else sec.groups.forEach((g,gi)=>{
     const qs=g.qs; h+='<div class="pgrp">';
@@ -17620,7 +17710,7 @@ function pDrawSec(el,y,sec,st){
       (chk?'':'<div class="count">先點文章裡的空格（或自動選下一格），再點上面的選項填進去。</div>');
     qs.forEach(q=>{
       if(sec.id==="fill"||sec.id==="struct"||sec.id==="cloze"&&!q.stem){ if(sec.id==="cloze")h+='<div class="pq"><span class="pn">'+q.n+'</span>'+pOpts(y,sec,q,st)+'</div>'; return; }
-      h+='<div class="pq"><div class="pstem"><span class="pn">'+q.n+'</span>'+(q.stem?pWords(q.stem).replace(/___/g,'<u class="blank">'+(st.ans[q.n]&&q.opts&&sec.id==="vocab"?esc(q.opts[LET.indexOf(st.ans[q.n])]):'　　　')+'</u>').replace(/\n/g,"<br>"):"")+(q.pts?' <span class="count">（'+q.pts+' 分）</span>':'')+'</div>';
+      h+='<div class="pq"><div class="pstem"><span class="pn">'+q.n+'</span>'+(q.stem?pWords(q.stem).replace(/___/g,'<u class="blank">'+(st.ans[q.n]&&q.opts&&sec.id==="vocab"?esc(q.opts[LET.indexOf(st.ans[q.n])]):'　　　')+'</u>').replace(/\n/g,"<br>"):"")+(q.pts?' <span class="count">（'+q.pts+' 分）</span>':'')+(typeof starQTag==="function"?starQTag(sec.id,q):'')+'</div>';
       (q.imgs||[]).forEach(f=>h+=pImg(f));
       if(q.type==="write"){ const v=st.ans[q.n]||"";
         h+='<textarea class="inp pta" data-w="'+q.n+'" rows="2" placeholder="寫下你的答案" spellcheck="false"'+(chk?" readonly":"")+'>'+esc(v)+'</textarea>';
@@ -17639,6 +17729,7 @@ function pDrawSec(el,y,sec,st){
   el.innerHTML=h;
   /* 互動 */
   bindChWords(el);
+  if(typeof starBindPast==="function")starBindPast(el);
   el.querySelectorAll(".popt[data-q]").forEach(b=>b.onclick=()=>{st.ans[b.dataset.q]=b.dataset.l;save();pDrawSec(el,y,sec,st);});
   el.querySelectorAll(".popt[data-m]").forEach(b=>b.onclick=()=>{const n=b.dataset.m,L=b.dataset.l; let a=st.ans[n]||""; a=a.includes(L)?a.replace(L,""):a+L; st.ans[n]=a.split("").sort().join(""); save(); pDrawSec(el,y,sec,st);});
   el.querySelectorAll("textarea[data-w]").forEach(t=>t.oninput=()=>{st.ans[t.dataset.w]=t.value;save();});
@@ -17719,6 +17810,283 @@ const EXAM_CORP=(()=>{ const out=[];
   return out; })();
 function allCorpus(){ return EXAM_CORP.concat(S.corpus||[]); }
 function examHits(x){ const re=wordRegex(x), out=[]; if(!re)return out; EXAM_CORP.forEach(c=>c.s.forEach(s=>{ if(re.test(s))out.push({src:c.src,s:s}); })); return out; }
+
+</script>
+<script>
+/* ══════════ STAR 解題法：用 S 情境 → T 任務 → A 行動 → R 結果 拆解學測英文各題型 ══════════ */
+const STAR_K=[
+  {k:"S",en:"Situation",zh:"情境",c:"#26456E",step:"讀出發生什麼事",q:"這段文字／這個句子在講什麼？誰、在哪、發生什麼？",d:"先不急著看選項。用 5 秒抓出主角、場景與事件，把題目放回它的情境裡。情境對了，選項自然少一半。"},
+  {k:"T",en:"Task",zh:"任務",c:"#3F72AF",step:"判斷題目要你做什麼",q:"這題考什麼？要我選詞、找細節、推論，還是排結構？",d:"看題幹的訊號字辨認題型：mainly about 是主旨、refer to 是指涉、infer 是推論。題型決定你要回文章哪裡找。"},
+  {k:"A",en:"Action",zh:"行動",c:"#D9A441",step:"理解線索之間的關係",q:"線索在哪？它和空格／選項是什麼關係：因果、對比、同義、指代？",d:"回到原文定位，圈出線索字（because / however / such…that / this），判斷線索與答案的邏輯關係，再用刪去法排除。"},
+  {k:"R",en:"Result",zh:"結果",c:"#7B61C9",step:"選出答案並回代驗證",q:"把答案放回去，句子通順嗎？文意、詞性、時態都對嗎？",d:"答案要放回原句朗讀一次：語意通、文法對、語塊自然，才算完成。答錯的題目回頭檢查是哪一步斷掉。"}
+];
+
+/* ── 大題題型 STAR ── */
+const STAR_SEC={
+  vocab:{nm:"詞彙題",ic:"🔤",pts:"10 題・每題 1 分",time:"約 5 分鐘",
+    S:"一個完整句子，描述生活、職場或社會情境。先讀懂整句在講誰、發生什麼事。",
+    T:"選出最適合空格的單字。先判斷空格的詞性（名詞？形容詞？副詞？），四個選項通常詞性相同，考的是語意與搭配。",
+    A:["看空格前後的搭配詞：a ___ schedule、___ expected","找句中的邏輯線索：such…that 因果、but / although 對比、and 並列","刪去語意或搭配不合的選項（修飾人的形容詞不能修飾物）"],
+    R:"把答案放回句子念一次；能說成自然的語塊（a tight schedule）才對。錯的字連同語塊一起記。",
+    trap:"只看中文意思選字：四個選項中譯都「好像可以」，要靠英文搭配與上下文決定。",
+    ex:{y:115,sec:"vocab",n:1,q:"The mayor has such a ___ schedule that it takes weeks to arrange an interview with her.",o:"(A) hasty (B) tight (C) diligent (D) routine",
+      S:"市長的行程多到要等好幾週才排得到採訪。",T:"空格在 a ___ schedule，選形容詞修飾 schedule。",
+      A:"線索是 such…that 因果：結果「要等好幾週」→ 原因是「行程很滿」。hasty 匆忙的、diligent 勤奮的多用來形容人；routine 例行的不會造成要等好幾週。",
+      R:"(B) tight → a tight schedule（緊湊的行程），回代因果通順 ✓"}},
+  cloze:{nm:"綜合測驗",ic:"🧩",pts:"10 題・每題 1 分",time:"約 8 分鐘",
+    S:"一篇短文挖了空格。先把全文快速讀一遍，抓主題與段落走向，不要一格一格卡住。",
+    T:"每格考的可能是單字、片語、轉折語或文法。先判斷這一格屬於哪一種：語意？連接詞？句構？",
+    A:["轉折語題：看空格前後兩句是順接、對比、舉例還是總結","單字題：看前後句的同義重述或因果","文法題：看主詞、動詞、時態與句子是否已完整"],
+    R:"把答案放回段落朗讀，確認上下兩句的邏輯接得起來，而不只是單句通順。",
+    trap:"只讀空格所在的那一句：綜合測驗的線索常在前一句或後一句。",
+    ex:{y:115,sec:"cloze",n:14,q:"When all members in a group know what’s going on with each other, it is ___ that they will fight.",o:"(A) hardly surprising (B) more acceptable (C) truly important (D) less likely",
+      S:"犀牛透過糞便得知彼此的狀態，前一句說這對群體的和平很重要。",T:"選出評論「會打架」這件事的形容詞片語。",
+      A:"線索是前句的 peace and harmony：大家都了解彼此 → 打架的可能性變小。(A)(B)(C) 都把打架說成正常或重要，和「和平」矛盾。",
+      R:"(D) less likely → it is less likely that they will fight ✓"}},
+  fill:{nm:"文意選填",ic:"🗂️",pts:"10 題・每題 1 分",time:"約 8 分鐘",
+    S:"一篇短文、十個空格、十個選項。先讀全文，掌握主題與每段重點。",
+    T:"把十個選項放進正確的空格。第一步先把選項依詞性分組：名詞、動詞、形容詞、副詞、片語。",
+    A:["看空格前後決定詞性：the ___ 要名詞、may ___ 要原形動詞、a ___ benefit 要形容詞","在同一詞性組內用語意與搭配決定","先填最有把握的格，剩下的選項會越來越少"],
+    R:"十個選項各用一次；填完整篇朗讀，檢查詞性、單複數與語意。",
+    trap:"一格填錯會連帶讓別格也錯，沒把握的格子留到最後再決定。",
+    ex:{y:115,sec:"fill",n:24,q:"This suggests that napping may significantly ___ age-related brain shrinkage, and thus lower the possibility of developing dementia.",o:"選項：retain / depend on / atmosphere / delay / unproductive / risk / function / minimal / dramatic / point to",
+      S:"文章談午睡對大腦的好處：大腦會隨年齡萎縮，但午睡習慣者的大腦保存較好。",T:"may significantly ___ 後面要原形動詞，受詞是 brain shrinkage。",
+      A:"先分組：動詞有 retain、depend on、delay、point to。語意上：午睡能「延緩」萎縮，後面 and thus lower the possibility 是它的結果。retain 保持萎縮不合理；depend on、point to 語意不通。",
+      R:"(D) delay → delay age-related brain shrinkage ✓"}},
+  struct:{nm:"篇章結構",ic:"🧱",pts:"4 題・每題 2 分",time:"約 7 分鐘",
+    S:"一篇文章抽掉 4 個句子，給 5 個選項（有 1 個多餘）。先讀每段在講什麼。",
+    T:"判斷每個空格在段落中的功能：段首主題句？舉例？補充說明？段尾總結？",
+    A:["段首空格：看段落後面所有句子共同在說什麼","段中空格：看前一句與後一句的連接（for example、also、however）","選項中的指代字（this、these、another）要能在前文找到對象"],
+    R:"把句子放回去，前後句的指代與邏輯都要接上；多出的那一句通常是看似相關但偏題的。",
+    trap:"只看關鍵字相同就選：干擾選項常和文章用同樣的字，但功能不對。",
+    ex:{y:115,sec:"struct",n:34,q:"___ As many psychologists now point out, this simple gesture is in fact far more complicated than it may appear.",o:"(B) Various factors have thus contributed to the phenomenon of smiling.",
+      S:"全文談微笑：前三段分別說明歷史、文化詮釋、個人主義與移民對微笑的影響。",T:"34 在最後一段段首，要一個能收束全文的句子。",
+      A:"線索 thus（因此）＋ various factors（多種因素）＝總結前三段；後句「心理學家說微笑比看起來複雜」正好承接「很多因素」。",
+      R:"(B) ✓ 回讀：多種因素 → 所以很複雜，邏輯連貫"}},
+  read:{nm:"閱讀測驗",ic:"📖",pts:"12 題・每題 2 分",time:"約 25 分鐘",
+    S:"3 篇文章，每篇 4 題。先看標題、段首句與圖表，抓出文章類型（說明文、記敘文、廣告）與主題。",
+    T:"先讀題幹、不看選項，用訊號字判斷題型（見「閱讀題型雷達」）。題型決定要回文章哪裡找。",
+    A:["主旨題：看首段、末段與各段段首句","細節題：用題幹關鍵字（專有名詞、數字）回文定位","推論題：答案不會原文照抄，但一定有依據","字義／指涉題：看該字的前後一句"],
+    R:"每個選項都要在原文找到證據；「部分對、部分錯」的選項要整個刪掉。",
+    trap:"選了「自己覺得對」但文章沒說的選項；或被原文照抄但改了一個關鍵字的選項騙。",
+    ex:{y:115,sec:"read",n:36,q:"Which of the following idioms is closest in meaning to “exacerbated the situation” in the third paragraph?",o:"(A) Broke the ice. (B) Cost an arm and a leg. (C) Missed the boat. (D) Added fuel to the fire.",
+      S:"Endurance 號被浮冰困住，冰的壓力讓船板變形。",T:"字義題：找與 exacerbated the situation 意思最接近的慣用語。",
+      A:"回到第三段：Freezing water rushed in and exacerbated the situation。冰水灌入，讓原本已經很糟的情況更糟 → 「讓事情惡化」。break the ice 是打破僵局，cost an arm and a leg 是很貴，miss the boat 是錯失良機。",
+      R:"(D) Added fuel to the fire（火上加油）✓"}},
+  mixed:{nm:"混合題",ic:"🧮",pts:"4 小題・共 12 分",time:"約 8 分鐘",
+    S:"一篇文章或多則短文（如商店介紹、論壇討論），題型混合填充、多選與簡答。",
+    T:"看清楚每小題的作答規則：從文章找「單詞」、需要「字形變化」、多選要選「所有」正確的選項。",
+    A:["摘要填空：看空格前後的詞性與句構，回文找同義的字再變形","多選題：逐一檢查每個選項，每個都要有原文證據","簡答題：題目常用同義改寫，要在原文找出對應的片語"],
+    R:"檢查字形（詞性、時態、單複數、被動 p.p.）與拼字；字形錯誤只得部分分。",
+    trap:"直接抄原文沒有變形：原文 innovative、blend，空格需要 innovation、blended。",
+    ex:{y:115,sec:"mixed",n:47,q:"…where tradition coexists harmoniously with __(47)__, and local features are perfectly __(48)__ with foreign elements.",o:"從文章中找單詞，並做適當字形變化",
+      S:"Wonder Village：傳統原住民村落，同時有許多新開的特色商店。",T:"摘要填空：從文章找單詞、依句構變形。",
+      A:"47：with 後要名詞，要和 tradition（傳統）對比 → 原文 innovative menu items → 名詞 innovation。48：are perfectly ___ with 是被動語態，要 p.p. → 原文 A truly unique blend → blended。",
+      R:"47 innovation、48 blended ✓（字形錯誤只得 1 分）"}},
+  trans:{nm:"中譯英",ic:"🔁",pts:"2 題・每題 4 分",time:"約 10 分鐘",
+    S:"兩句相關的中文，通常是同一個情境的前後句。先讀懂兩句的關係。",
+    T:"譯成正確、通順的英文。評分是每個錯誤扣 0.5 分，時態、單複數、拼字、大寫與標點都會被扣分。",
+    A:["先找主詞與動詞，決定時態：「已經增加」→ 現在完成式","把中文切成英文語塊：越來越多…＝more and more…","用有把握的字，不要硬拼不會的難字"],
+    R:"逐項檢查：句首大寫、句尾標點、主詞動詞一致、時態、冠詞、拼字。",
+    trap:"逐字直譯中文語序；或時態沒有對上中文的「已經」「正在」「將」。",
+    ex:{y:115,sec:"write",n:"trans1",q:"現在越來越多高中英文老師已經增加在課堂上使用英文的百分比。",o:"",
+      S:"講台灣高中英文課的改變：老師們上課用英文的比例提高了。",T:"譯成一句英文，4 分，每個錯誤扣 0.5 分。",
+      A:"主詞＝more and more senior high school English teachers；動詞＝「已經增加」→ 現在完成式 have increased；受詞＝the percentage of English use；地點＝in class。",
+      R:"Nowadays, more and more senior high school English teachers have increased the percentage of English use in class. ✓"}},
+  essay:{nm:"英文作文",ic:"✍️",pts:"1 題・20 分",time:"約 25 分鐘",
+    S:"一個生活情境或圖片，搭配中文提示，規定分段與內容。",
+    T:"逐條拆解提示：分幾段？每段要寫什麼？至少 120 個單詞。任務沒完成是最大的失分點。",
+    A:["依提示列出兩段大綱，每段一個主題句","主題句後接 2–3 個具體細節或例子","用轉折語串起句子：First / In addition / As a result"],
+    R:"檢查是否切題、有分段、字數足夠（不足或未分段各扣 1 分）、時態一致、拼字與標點。",
+    trap:"寫得很長但沒回答提示的某一部分，例如只描述現象、沒寫原因或影響。",
+    ex:{y:115,sec:"write",n:"essay",q:"近年來養寵物的風氣在臺灣日漸普遍……文分兩段。第一段描述圖片中的現象；第二段說明此現象的原因以及可能的影響。",o:"",
+      S:"寵物在人們生活中的角色改變了。",T:"兩段、至少 120 個單詞：第一段描述現象，第二段寫原因＋影響。",
+      A:"大綱：P1 主題句 Pets are playing a different role… ＋圖片中的細節；P2 原因（少子化、陪伴需求）＋影響（寵物產業、責任）。",
+      R:"對照提示逐項打勾：現象 ✓ 原因 ✓ 影響 ✓ 兩段 ✓ 120 字 ✓"}}
+};
+
+/* ── 閱讀與混合題的題型（T 任務）── */
+const STAR_RT={
+  main:{nm:"主旨題",ic:"🎯",sig:"mainly about・main idea・best title",
+    S:"整篇文章在講什麼？",T:"選出涵蓋全文的主題，不是其中一段的細節。",
+    A:"讀首段與末段、各段段首句，找出反覆出現的主題字；太窄（只講一段）或太廣（超出文章）的選項都刪掉。",R:"問自己：這個選項能當全文的標題嗎？每一段都在支持它嗎？"},
+  detail:{nm:"細節題",ic:"🔍",sig:"true・NOT・according to・which question can…answer",
+    S:"題幹問的是文章中的哪一個具體資訊？",T:"判斷選項的是非，或找出「沒提到」的那一項。",
+    A:"用選項中的專有名詞、數字、年代回文定位，逐一核對；NOT 題要找出三個有提到的，剩下的就是答案。",R:"答案必須在原文找得到依據；改了一個字（all ↔ some、before ↔ after）的選項就是陷阱。"},
+  infer:{nm:"推論題",ic:"🧠",sig:"infer・imply・most likely・learn from",
+    S:"文章說了什麼，可以合理推出什麼？",T:"選出由文章推得出、但原文沒有直接寫的結論。",
+    A:"先找相關段落，再問「由這段可以推出什麼」；推論只能跨一小步，不能加入自己的背景知識。",R:"每個推論都要能指出是哪一句給的依據；推太遠的選項刪掉。"},
+  vocab:{nm:"字義題",ic:"🔤",sig:"mean by・closest in meaning",
+    S:"這個字或片語出現在什麼句子裡？",T:"依上下文判斷它在這裡的意思（常是慣用語或一字多義）。",
+    A:"回到該句與前後一句，把選項代回原句，看哪一個語意最通；不要只用字典上的第一個意思。",R:"代回原文朗讀：意思通、語氣也對。"},
+  ref:{nm:"指涉題",ic:"👉",sig:"refer to・this / them / it",
+    S:"代名詞出現在哪一句？前面提到了什麼？",T:"找出 this、them、it 代替的名詞或事件。",
+    A:"通常往前一句找；檢查單複數（them 指複數）與詞性（this procedure 指一個程序）。",R:"把答案代入代名詞的位置，句子意思要完整通順。"},
+  purpose:{nm:"寫作目的／結構題",ic:"🧭",sig:"purpose・develop・conclude・why does the author use",
+    S:"作者這一段或這個說法是為了做什麼？",T:"判斷段落功能或寫作手法：舉例、對比、時間順序、提出問題、總結。",
+    A:"看段落之間的關係與轉折字（however、for example、finally）；描述手法的選項要和全文結構一致。",R:"用一句話說出「作者用這段來……」，再比對選項。"},
+  insert:{nm:"句子插入題",ic:"📌",sig:"Here is a sentence…Which paragraph",
+    S:"這個句子在講什麼主題？",T:"判斷它應該放在第幾段。",
+    A:"抓句子裡的關鍵字與指代字（This design、Almost nothing），找出討論同一主題、且前文有對應對象的段落。",R:"放進去後，指代對得上、段落主題一致。"},
+  visual:{nm:"圖表題",ic:"🗺️",sig:"picture・route・chart・map",
+    S:"圖片或路線對應文章的哪一段描述？",T:"選出與文字描述相符的圖。",
+    A:"從文章列出關鍵特徵（形狀、方向、順序、地點），一個一個對照圖片刪去。",R:"圖中每個細節都要與原文一致，不能只對一半。"},
+  sum:{nm:"摘要填空",ic:"📝",sig:"從文章中找出單詞・字形變化",
+    S:"摘要句在濃縮文章的哪一部分？",T:"從文章找出一個單詞，依句構做字形變化後填入。",
+    A:"先判斷空格要的詞性與形式（名詞、p.p.、複數），再回文找同義的字並改成正確字形。",R:"檢查詞性、字形與拼字；原文照抄沒變形只得部分分。"},
+  multi:{nm:"多選整合",ic:"☑️",sig:"choose the ONES・多選題",
+    S:"題目要你整合哪幾段或哪幾則資訊？",T:"選出所有符合條件的選項（可能不只一個）。",
+    A:"每個選項獨立判斷，逐一回文找證據；把條件拆開檢查（例如「兩者皆是」要兩邊都成立）。",R:"每選一項都要有證據；沒證據的不要選。"},
+  short:{nm:"簡答（找原文）",ic:"💬",sig:"Which phrase…・簡答",
+    S:"題目用自己的話描述了原文的哪個概念？",T:"在原文找出對應的片語或句子。",
+    A:"把題目的關鍵字換成同義字，回文找改寫前的原句；注意是誰說的（Joseph Tang）或在哪一段。",R:"照原文抄寫片語，拼字要正確。"}
+};
+const STAR_RT_ORDER=["main","detail","infer","vocab","ref","purpose","insert","visual"];
+
+function starType(secId,q){
+  if(secId==="mixed"){ if(q.type==="multi")return"multi"; if(/請從文章中找出|從文章中選出|摘記/.test(q.stem||""))return"sum"; return"short"; }
+  const s=q.stem||"";
+  if(/Here is a sentence/i.test(s))return"insert";
+  if((q.imgs&&q.imgs.length)||/pictures? shows?|correct route|chart/i.test(s))return"visual";
+  if(/refer/i.test(s))return"ref";
+  if(/mean by|closest in meaning|carries the meaning/i.test(s))return"vocab";
+  if(/mainly about|main idea|best title/i.test(s))return"main";
+  if(/develop the ideas|conclude|purpose|Why does the author/i.test(s))return"purpose";
+  if(/infer|imply|most likely|learn from/i.test(s))return"infer";
+  return"detail";
+}
+let _starIdx=null;
+function starIndex(){
+  if(_starIdx)return _starIdx; const out=[];
+  (typeof PAST_YEARS!=="undefined"?PAST_YEARS:[113,114,115]).forEach(y=>{ const P=PAST[y]; if(!P)return;
+    P.sections.forEach(sec=>{ if(sec.id!=="read"&&sec.id!=="mixed")return;
+      sec.groups.forEach(g=>g.qs.forEach(q=>{ if(sec.id==="mixed"&&q.n===48&&/47/.test(q.stem||""))return;
+        out.push({y:y,sec:sec.id,n:q.n,stem:(q.stem||"").replace(/（[^）]*分）/g,"").trim(),t:starType(sec.id,q)}); })); }); });
+  return _starIdx=out;
+}
+
+let starTab="what", starSel="S", starSecSel="vocab", starRtSel="main", starQ=null;
+
+function starWheel(){
+  const cx=150,cy=150,R=128,r=48;
+  const quad=(i)=>{ const a0=-90+i*90, a1=a0+90, rad=d=>d*Math.PI/180;
+    const p=(ang,rr)=>[cx+rr*Math.cos(rad(ang)),cy+rr*Math.sin(rad(ang))];
+    const [x0,y0]=p(a0,R),[x1,y1]=p(a1,R),[x2,y2]=p(a1,r),[x3,y3]=p(a0,r);
+    return "M"+x0+" "+y0+" A"+R+" "+R+" 0 0 1 "+x1+" "+y1+" L"+x2+" "+y2+" A"+r+" "+r+" 0 0 0 "+x3+" "+y3+" Z"; };
+  /* 順時針：S 左上、T 右上、A 右下、R 左下 */
+  const pos=[{i:3,lx:92,ly:104},{i:0,lx:208,ly:104},{i:1,lx:208,ly:212},{i:2,lx:92,ly:212}];
+  return '<svg class="stw" viewBox="0 0 300 300" role="group" aria-label="STAR 解題法四步驟">'+
+    '<circle cx="150" cy="150" r="143" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-dasharray="4 6"/>'+
+    STAR_K.map((k,j)=>{const P=pos[j], on=starSel===k.k;
+      return '<g class="stq'+(on?" on":"")+'" data-k="'+k.k+'" tabindex="0" role="button" aria-label="'+k.k+' '+k.zh+'">'+
+        '<path d="'+quad(P.i)+'" fill="'+k.c+'" fill-opacity="'+(on?1:.28)+'"/>'+
+        '<text x="'+P.lx+'" y="'+P.ly+'" text-anchor="middle" class="stL" fill="'+(on?"#fff":k.c)+'">'+k.k+'</text>'+
+        '<text x="'+P.lx+'" y="'+(P.ly+22)+'" text-anchor="middle" class="stZ" fill="'+(on?"#fff":k.c)+'">'+k.zh+'</text></g>';}).join("")+
+    '<circle cx="150" cy="150" r="44" fill="var(--paper,#fff)" stroke="currentColor" stroke-opacity=".12"/>'+
+    '<text x="150" y="148" text-anchor="middle" class="stC">STAR</text><text x="150" y="168" text-anchor="middle" class="stC2">解題法</text></svg>';
+}
+function starCardHTML(o,short){
+  const A=Array.isArray(o.A)?'<ul>'+o.A.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>':'<p>'+esc(o.A)+'</p>';
+  return '<div class="stgrid">'+
+    '<div class="stc s"><b><i>S</i>情境</b><p>'+esc(o.S)+'</p></div>'+
+    '<div class="stc t"><b><i>T</i>任務</b><p>'+esc(o.T)+'</p></div>'+
+    '<div class="stc a"><b><i>A</i>行動</b>'+A+'</div>'+
+    '<div class="stc r"><b><i>R</i>結果</b><p>'+esc(o.R)+'</p></div></div>'+
+    (!short&&o.trap?'<div class="sttrap">⚠️ <b>常見陷阱</b>　'+esc(o.trap)+'</div>':'');
+}
+function starExHTML(e){
+  const lab=typeof e.n==="number"?"第 "+e.n+" 題":(e.n==="essay"?"英文作文":"中譯英第 1 題");
+  return '<div class="stex"><div class="stex-h"><span class="tag">真題示範</span><b>'+e.y+' 學測・'+lab+'</b>'+
+    '<button class="btn g sm" data-stgo="'+e.y+'|'+e.sec+'|'+e.n+'">📜 去做這一題</button></div>'+
+    '<div class="stex-q">'+esc(e.q)+(e.o?'<div class="count">'+esc(e.o)+'</div>':'')+'</div>'+
+    '<ol class="stex-s">'+["S","T","A","R"].map((k,i)=>'<li class="'+k.toLowerCase()+'"><i>'+k+'</i><span><b>'+STAR_K[i].zh+'</b>　'+esc(e[k])+'</span></li>').join("")+'</ol></div>';
+}
+function starGoPast(y,sec,n){
+  if(typeof pY==="undefined")return; pY=+y; pSec=sec; pAct=null; go("past");
+  setTimeout(()=>{ const b=$("pBody"); if(!b)return; let t=null;
+    if(/^\d+$/.test(String(n)))b.querySelectorAll(".pn,.pb").forEach(x=>{ if(!t&&x.textContent.trim()===String(n))t=x; });
+    if(!t&&n==="essay")t=b.querySelector('textarea[data-w="essay"]');
+    t=(t&&(t.closest(".pq")||t.closest(".pgrp")||t))||b;
+    t.scrollIntoView({block:"center",behavior:"smooth"}); t.classList.add("stflash"); setTimeout(()=>t.classList.remove("stflash"),2200); },420);
+}
+
+function drawStar(){
+  const box=$("starBox"); if(!box)return;
+  const tabs=[["what","⭐ STAR 是什麼"],["sec","🧩 大題題型"],["read","📡 閱讀題型雷達"],["game","🎯 題型辨識挑戰"]];
+  let h='<div class="sttabs" role="tablist">'+tabs.map(([k,n])=>'<button role="tab" aria-selected="'+(k===starTab)+'" data-tab="'+k+'" class="'+(k===starTab?"on":"")+'">'+n+'</button>').join("")+'</div><div class="stbody">';
+  if(starTab==="what"){
+    const k=STAR_K.find(x=>x.k===starSel);
+    h+='<div class="ststeps">'+[["STEP 1","讀出發生什麼事","S"],["STEP 2","判斷題目要你做什麼","T"],["STEP 3","理解線索之間的關係","A"],["STEP 4","選出答案並回代驗證","R"]].map(([a,b,c])=>'<button class="ststep'+(starSel===c?" on":"")+'" data-k="'+c+'"><small>'+a+'</small><b>'+b+'</b></button>').join("")+'</div>'+
+      '<div class="stwrap">'+starWheel()+'<div class="stdesc" style="--k:'+k.c+'"><div class="stbig"><span>'+k.k+'</span><div><b>'+k.zh+'</b><small>'+k.en+'</small></div></div>'+
+      '<p class="stask">❓ '+esc(k.q)+'</p><p>'+esc(k.d)+'</p></div></div>'+
+      '<div class="warnbox" style="margin-top:14px">💡 <b>為什麼用 STAR？</b>　答錯時，大部分的原因不是「單字不會」，而是某一步斷掉了：沒讀懂情境（S）、看錯題型（T）、找錯線索（A）或沒有回代檢查（R）。用 STAR 檢討錯題，就知道下次要補哪一步。</div>'+
+      '<div class="stuse"><div><b>📜 作答時</b><p>歷屆學測每個大題上方都有「⭐ STAR 解題提示」，閱讀題旁會標出題型（T）。</p></div><div><b>📕 檢討時</b><p>對完答案後，問自己：錯在 S、T、A 還是 R？把那一步寫在錯題旁邊。</p></div><div><b>🎯 練習時</b><p>到「題型辨識挑戰」用 113–115 的真實題幹，練習 3 秒判斷題型。</p></div></div>';
+  }
+  if(starTab==="sec"){
+    const o=STAR_SEC[starSecSel];
+    h+='<div class="stchips">'+Object.keys(STAR_SEC).map(k=>'<button data-sec="'+k+'" class="'+(k===starSecSel?"on":"")+'">'+STAR_SEC[k].ic+' '+STAR_SEC[k].nm+'</button>').join("")+'</div>'+
+      '<div class="sthead"><h3>'+o.ic+' '+o.nm+'</h3><span class="tag">'+o.pts+'</span><span class="tag">建議 '+o.time+'</span></div>'+
+      starCardHTML(o)+starExHTML(o.ex);
+  }
+  if(starTab==="read"){
+    const I=starIndex(), Y=[...new Set(I.map(x=>x.y))], keys=STAR_RT_ORDER.concat(["sum","multi","short"]);
+    const cnt=(t,y)=>I.filter(x=>x.t===t&&(!y||x.y===y)).length, mx=Math.max(...keys.map(t=>cnt(t)));
+    h+='<p class="count">把 113–115 學測閱讀測驗與混合題的 '+I.length+' 個題幹，依「T 任務」的訊號字分類。點一列看 STAR 解法與真題。</p>'+
+      '<div class="strt"><div class="strt-r strt-hd"><span>題型</span>'+Y.map(y=>'<span>'+y+'</span>').join("")+'<span>合計</span></div>'+
+      keys.map((t,i)=>{const o=STAR_RT[t], c=cnt(t); return (i===8?'<div class="strt-sep">混合題</div>':'')+
+        '<button class="strt-r'+(t===starRtSel?" on":"")+'" data-rt="'+t+'"><span>'+o.ic+' '+o.nm+'</span>'+Y.map(y=>'<span>'+(cnt(t,y)||"·")+'</span>').join("")+
+        '<span class="strt-bar"><i style="width:'+Math.round(c/mx*100)+'%"></i><em>'+c+'</em></span></button>';}).join("")+'</div>';
+    const o=STAR_RT[starRtSel], L=I.filter(x=>x.t===starRtSel);
+    h+='<div class="sthead"><h3>'+o.ic+' '+o.nm+'</h3><span class="count">訊號字：<code>'+esc(o.sig)+'</code></span></div>'+starCardHTML(o,true)+
+      '<div class="stlist"><b>真題（'+L.length+'）</b>'+L.map(x=>'<button data-stgo="'+x.y+'|'+x.sec+'|'+x.n+'"><span class="tag">'+x.y+'・'+x.n+'</span>'+esc(x.stem.length>150?x.stem.slice(0,150)+"…":x.stem)+'</button>').join("")+'</div>';
+  }
+  if(starTab==="game"){
+    if(!S.starG||typeof S.starG!=="object")S.starG={ok:0,n:0,best:0,run:0};
+    const G=S.starG, pool=starIndex().filter(x=>x.sec==="read");
+    if(!starQ)starQ={x:pool[Math.floor(Math.random()*pool.length)],pick:null};
+    const q=starQ, done=!!q.pick;
+    h+='<div class="stgame"><div class="stg-top"><span>答對 <b>'+G.ok+'</b> / '+G.n+'</span><span>連對 <b>'+G.run+'</b>（最佳 '+G.best+'）</span></div>'+
+      '<div class="stg-q"><span class="tag">'+q.x.y+' 學測・第 '+q.x.n+' 題</span><p>'+esc(q.x.stem)+'</p><small>STEP 2：這題要你做什麼？先別看選項，只看題幹判斷題型。</small></div>'+
+      '<div class="stg-opts">'+STAR_RT_ORDER.map(t=>{let c=""; if(done){ if(t===q.x.t)c=" ok"; else if(t===q.pick)c=" bad"; }
+        return '<button data-g="'+t+'" class="'+c+'"'+(done?" disabled":"")+'>'+STAR_RT[t].ic+' '+STAR_RT[t].nm+'</button>';}).join("")+'</div>';
+    if(done){ const o=STAR_RT[q.x.t];
+      h+='<div class="stg-fb '+(q.pick===q.x.t?"ok":"bad")+'"><b>'+(q.pick===q.x.t?"✅ 判斷正確！":"再看一次訊號字 👀")+'</b> 這是<b>'+o.nm+'</b>，訊號字：<code>'+esc(o.sig)+'</code></div>'+starCardHTML(o,true)+
+        '<div class="pact"><button class="btn p" id="stNext" style="flex:1">下一題 →</button><button class="btn g" data-stgo="'+q.x.y+'|'+q.x.sec+'|'+q.x.n+'">📜 去做這一題</button></div>';
+    }
+    h+='</div>';
+  }
+  h+='</div>';
+  box.innerHTML=h;
+  box.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{starTab=b.dataset.tab;drawStar();});
+  box.querySelectorAll(".stq[data-k],.ststep[data-k]").forEach(b=>{const f=()=>{starSel=b.dataset.k;drawStar();}; b.onclick=f; b.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f();}};});
+  box.querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{starSecSel=b.dataset.sec;drawStar();});
+  box.querySelectorAll("[data-rt]").forEach(b=>b.onclick=()=>{starRtSel=b.dataset.rt;drawStar();});
+  box.querySelectorAll("[data-stgo]").forEach(b=>b.onclick=()=>{const [y,s,n]=b.dataset.stgo.split("|"); starGoPast(y,s,/^\d+$/.test(n)?+n:n);});
+  box.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{ const G=S.starG; starQ.pick=b.dataset.g; G.n++;
+    if(starQ.pick===starQ.x.t){G.ok++;G.run++;G.best=Math.max(G.best,G.run); if(typeof cheerOnGain==="function")cheerOnGain();} else { G.run=0; if(typeof cheerOnMistake==="function")cheerOnMistake(); }
+    save(); drawStar(); });
+  const nx=box.querySelector("#stNext"); if(nx)nx.onclick=()=>{ const pool=starIndex().filter(x=>x.sec==="read"&&x!==starQ.x); starQ={x:pool[Math.floor(Math.random()*pool.length)],pick:null}; drawStar(); };
+}
+
+/* ── 歷屆學測作答時的 STAR 提示 ── */
+function starSecHint(secId){
+  const ks=secId==="write"?["trans","essay"]:[secId]; if(!STAR_SEC[ks[0]])return"";
+  return '<details class="stdet"><summary>⭐ STAR 解題提示：'+ks.map(k=>STAR_SEC[k].nm).join("・")+'怎麼拆？</summary>'+
+    ks.map(k=>(ks.length>1?'<h4>'+STAR_SEC[k].ic+' '+STAR_SEC[k].nm+'</h4>':'')+starCardHTML(STAR_SEC[k])).join("")+
+    '<button class="btn g sm" data-stsec="'+ks[0]+'">看完整真題示範 →</button></details>';
+}
+function starQTag(secId,q){
+  if(secId!=="read"&&secId!=="mixed")return""; const t=starType(secId,q), o=STAR_RT[t];
+  return '<button class="sttag" data-stt="'+t+'" title="看這個題型的 STAR 解法">T・'+o.nm+'</button>';
+}
+function starBindPast(el){
+  el.querySelectorAll(".sttag").forEach(b=>b.onclick=e=>{ e.stopPropagation(); const pq=b.closest(".pq"); if(!pq)return;
+    let m=pq.querySelector(".stmini"); if(m){m.remove();b.classList.remove("on");return;}
+    const o=STAR_RT[b.dataset.stt]; m=document.createElement("div"); m.className="stmini";
+    m.innerHTML='<div class="count">訊號字：<code>'+esc(o.sig)+'</code></div>'+starCardHTML(o,true);
+    b.closest(".pstem").after(m); b.classList.add("on"); });
+  el.querySelectorAll("[data-stsec]").forEach(b=>b.onclick=()=>{ starTab="sec"; starSecSel=b.dataset.stsec; go("star"); });
+}
 
 </script>
 <script>
