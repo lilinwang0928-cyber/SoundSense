@@ -16779,7 +16779,10 @@ function liveFrame(buf,sr){
 /* ══════════ 麥克風 ══════════ */
 const MIC={st:null,src:null,an:null,pr:null,g:null,rec:false,buf:[],raf:0,floor:0.002};
 async function micOpen(){
-  if(MIC.st)return true;
+  /* iPhone／iPad：音訊引擎必須在「按下按鈕的那一刻」就啟動，等麥克風授權（await）之後才啟動會被擋下，
+     結果錄到的是空的（顯示「錄音太短」）。所以先在這裡同步喚醒。 */
+  try{ ac(); }catch(e){}
+  if(MIC.st){ await micWake(); return true; }
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){labMsg('這個瀏覽器不能使用麥克風。請用 Chrome、Edge 或 Safari 開啟（iPhone 需 iOS 14.3 以上）。');return false;}
   try{
     MIC.st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
@@ -16793,7 +16796,11 @@ async function micOpen(){
     MIC.src.connect(MIC.pr); MIC.pr.connect(MIC.g); MIC.g.connect(A.destination);
     MIC.pr.onaudioprocess=e=>{if(MIC.rec)MIC.buf.push(new Float32Array(e.inputBuffer.getChannelData(0)));};
   }catch(e){labMsg('音訊引擎啟動失敗：'+esc(e.message||e));micClose();return false;}
+  await micWake();
   return true;
+}
+async function micWake(){
+  try{ const A=ac(); if(A.state!=="running") await Promise.race([A.resume(),new Promise(r=>setTimeout(r,800))]); }catch(e){}
 }
 function micClose(){
   cancelAnimationFrame(MIC.raf); MIC.raf=0;
@@ -16801,9 +16808,43 @@ function micClose(){
   try{MIC.src&&MIC.src.disconnect();MIC.pr&&MIC.pr.disconnect();MIC.g&&MIC.g.disconnect();}catch(e){}
   MIC.st=null;MIC.src=null;MIC.an=null;MIC.pr=null;MIC.rec=false;
 }
+/* 錄一段聲音給分析用。主要靠 ScriptProcessor 收樣本；
+   有些手機（特別是 iPhone Safari）它會收不到或只收到一點點，
+   所以同時用 MediaRecorder 錄一份，必要時解碼那一份來分析。 */
 function micRecord(sec){
-  return new Promise(res=>{MIC.buf=[];MIC.rec=true;
-    setTimeout(()=>{MIC.rec=false;const n=MIC.buf.reduce((a,b)=>a+b.length,0),x=new Float32Array(n);let o=0;MIC.buf.forEach(b=>{x.set(b,o);o+=b.length;});res(x);},sec*1000);});
+  return new Promise(res=>{
+    MIC.buf=[];MIC.rec=true;
+    let mr=null, chunks=[];
+    try{
+      if(window.MediaRecorder&&MIC.st){
+        const types=["audio/webm;codecs=opus","audio/mp4","audio/webm","audio/aac"];
+        const mt=types.find(t=>{try{return MediaRecorder.isTypeSupported(t);}catch(e){return false;}});
+        mr=mt?new MediaRecorder(MIC.st,{mimeType:mt}):new MediaRecorder(MIC.st);
+        mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+        mr.start();
+      }
+    }catch(e){mr=null;}
+    setTimeout(()=>{
+      MIC.rec=false;
+      const n=MIC.buf.reduce((a,b)=>a+b.length,0),x=new Float32Array(n);let o=0;MIC.buf.forEach(b=>{x.set(b,o);o+=b.length;});
+      const sr=ac().sampleRate;
+      if(x.length>=sr*sec*0.6||!mr){ try{mr&&mr.state!=="inactive"&&mr.stop();}catch(e){} res(x); return; }
+      /* ScriptProcessor 收得不夠：改解碼 MediaRecorder 那一份 */
+      mr.onstop=async()=>{
+        try{
+          const ab=await new Blob(chunks,{type:mr.mimeType||"audio/mp4"}).arrayBuffer();
+          const buf=await new Promise((ok,bad)=>{const p=ac().decodeAudioData(ab,ok,bad); if(p&&p.then)p.then(ok,bad);});
+          let y=buf.getChannelData(0);
+          if(buf.sampleRate!==sr){ /* 換成分析用的取樣率 */
+            const r=buf.sampleRate/sr, m=Math.floor(y.length/r), z=new Float32Array(m);
+            for(let i=0;i<m;i++)z[i]=y[Math.floor(i*r)]; y=z;
+          }
+          res(y.length>x.length?y:x);
+        }catch(e){ res(x); }
+      };
+      try{ mr.stop(); }catch(e){ res(x); }
+    },sec*1000);
+  });
 }
 function micLive(cb){
   cancelAnimationFrame(MIC.raf);
@@ -16918,6 +16959,7 @@ async function airGo(){
   const a=analyzeOnset(sig,ac().sampleRate);
   airBusy=false; btn.disabled=false; cue.innerHTML="再試一次，或換一個字";
   const res=$("labRes");
+  if(!a.ok&&sig.length<ac().sampleRate*0.3){res.className="result on meh";res.innerHTML="🤔 沒有收到麥克風的聲音。請確認：① 瀏覽器已允許使用麥克風；② 沒有其他 App 正在用麥克風（例如通話、錄音）；③ iPhone 請用 Safari 開啟，再按一次 🎙️。";return;}
   if(!a.ok){res.className="result on meh";res.innerHTML="🤔 "+esc(a.why)+"。";return;}
   let good=false, msg="";
   const tl=(v,max,zones)=>'<div style="position:relative;height:16px;background:var(--cream2);border-radius:99px;margin:8px 0 2px;overflow:hidden">'+
