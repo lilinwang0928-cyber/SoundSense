@@ -1487,6 +1487,26 @@ html[data-theme="dark"] .chip:hover{box-shadow:0 4px 14px rgba(0,0,0,.35)}
 @media(max-width:520px){.appbar .in{gap:8px}.logo{width:36px;height:36px;flex-basis:36px;border-radius:11px}.appbar .thm{width:32px;height:32px;font-size:.92rem}.brand h1{font-size:1rem}}
 @media(max-width:400px){.logo{display:none}.appbar .thm{width:30px;height:30px;font-size:.86rem}.appbar .thm.rld{margin-right:3px}}
 </style>
+<style>
+.humdemo{margin:12px 0 4px;padding:12px 14px;border-radius:14px;background:var(--blue-soft);border:1px solid var(--cream2)}
+.humdemo .hd-h,.humdemo .hd-s{font-size:.88rem;line-height:1.6}
+.humdemo .hd-step{display:inline-block;background:var(--blue-deep);color:#fff;border-radius:99px;padding:1px 10px;margin-right:8px;font-weight:800;font-size:.8rem}
+.humdemo.say .hd-s .hd-step,.humdemo.done .hd-s .hd-step{background:var(--pink-deep)}
+.humdemo .hd-mel{display:flex;align-items:flex-end;gap:8px;height:84px;margin:8px 0 6px;padding:0 4px}
+.humdemo .hd-n{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;padding:6px 10px;border-radius:12px;background:var(--paper);border:2px solid var(--cream2);transition:transform .12s ease,background .12s,border-color .12s;margin-bottom:0}
+.humdemo .hd-n b{font-size:1rem;letter-spacing:.5px}
+.humdemo .hd-n small{font-size:.72rem;color:var(--ink-soft);font-family:"Segoe UI","Lucida Sans Unicode",sans-serif}
+.humdemo .hd-n.st{margin-bottom:26px;min-width:64px}
+.humdemo .hd-n.st b{font-size:1.25rem;color:var(--pink-deep)}
+.humdemo .hd-n.on{background:#F7D9E1;border-color:var(--pink);transform:scale(1.14)}
+.humdemo .hd-n:not(.st).on{background:#DCE7F5;border-color:var(--blue)}
+.humdemo .hd-s .en{font-family:Georgia,"Times New Roman",serif;font-size:1.1rem}
+.humdemo .hd-you{margin-top:4px;color:var(--ink-soft);font-size:.84rem}
+.syl span.humon{transform:scale(1.12);box-shadow:0 0 0 3px rgba(224,106,138,.45);transition:transform .12s}
+html[data-theme="dark"] .humdemo .hd-n.on{background:#4a2530}
+html[data-theme="dark"] .humdemo .hd-n:not(.st).on{background:#22344d}
+</style>
+<style>.fsbox a.fslink{color:inherit;text-decoration:none}.fsbox a.fslink:hover b{text-decoration:underline}.fsbox a.btn{display:inline-flex;align-items:center;text-decoration:none}</style>
 </head>
 <body>
 <div id="nojsTip" role="alert">
@@ -14590,10 +14610,32 @@ function hum(n,st){
     return (t-A.currentTime)+0.05;
   }catch(e){return 0;}
 }
-function humThenSpeak(b,ipa){
-  const r=sylOf(ipa);
-  const sec=hum(r.syl.length,r.st)||0.4;
-  setTimeout(()=>speak(b,0.85),sec*1000+120);
+let HUMRUN=0;
+function humThenSpeak(b,ipa,btn){
+  const run=++HUMRUN, r=sylOf(ipa), n=r.syl.length, st=r.st, labels=r.syl.map(s=>kkP(s));
+  const host=btn?(btn.closest(".card")||btn.parentNode):null;
+  let dm=null;
+  if(btn&&host){ dm=host.querySelector(".humdemo");
+    if(!dm){ dm=document.createElement("div"); dm.className="humdemo"; let row=btn.parentNode; while(row&&row.parentNode!==host&&row.parentNode&&!row.parentNode.classList.contains("card"))row=row.parentNode; (row||btn).after(dm); } }
+  if(dm){ dm.classList.remove("say","done");
+    dm.innerHTML='<div class="hd-h"><span class="hd-step">① 先哼</span>用「da」哼出節奏：<b>DA</b> 高、長、大聲，<b>da</b> 低、短、輕</div>'+
+      '<div class="hd-mel">'+labels.map((s,i)=>'<span class="hd-n'+(i===st?" st":"")+'" data-i="'+i+'"><b>'+(i===st?"DA":"da")+'</b><small>'+esc(s)+'</small></span>').join("")+'</div>'+
+      '<div class="hd-s"></div>'; }
+  const chips=host?[...host.querySelectorAll(".syl span[data-i]")]:[];
+  const mark=(i,on)=>{ if(run!==HUMRUN)return; const e=dm&&dm.querySelector('.hd-n[data-i="'+i+'"]'); if(e)e.classList.toggle("on",on); if(chips[i])chips[i].classList.toggle("humon",on); };
+  if("speechSynthesis" in window)speechSynthesis.cancel();
+  const sec=hum(n,st)||0.45;
+  /* 畫面跟著哼唱的每一拍亮起（和 hum() 的節奏相同） */
+  const steps=[]; if(n<=1)steps.push([0.02,0.4]); else { let t=0.02; for(let i=0;i<n;i++){ const d=i===st?0.30:0.13; steps.push([t,d]); t+=d+0.07; } }
+  steps.forEach(([t0,d],i)=>{ setTimeout(()=>mark(i,true),t0*1000); setTimeout(()=>mark(i,false),(t0+d)*1000+60); });
+  setTimeout(()=>{ if(run!==HUMRUN)return;
+    if(dm){ dm.classList.add("say"); dm.querySelector(".hd-s").innerHTML='<span class="hd-step">② 再唸</span><b class="en">'+esc(b)+'</b>　重音落在 <b>'+esc(labels[st]||labels[0])+'</b>'; }
+    chips.forEach((c,i)=>c.classList.toggle("humon",i===st)); if(dm){ const e=dm.querySelector('.hd-n[data-i="'+st+'"]'); if(e)e.classList.add("on"); }
+    const fin=()=>{ if(run!==HUMRUN)return; chips.forEach(c=>c.classList.remove("humon")); if(dm){ dm.classList.remove("say"); dm.classList.add("done");
+      dm.querySelectorAll(".hd-n.on").forEach(e=>e.classList.remove("on"));
+      dm.querySelector(".hd-s").innerHTML+='<div class="hd-you">✓ 換你：先用 da 哼一次，再把字唸出來</div>'; } };
+    if(typeof speakThen==="function")speakThen(b,0.85,fin); else { speak(b,0.85); setTimeout(fin,1500); }
+  }, sec*1000+450);
 }
 const POSN={n:"名詞",v:"動詞",adj:"形容詞",adv:"副詞",prep:"介系詞",pron:"代名詞",conj:"連接詞",art:"冠詞",aux:"助動詞",int:"感嘆詞"};
 
@@ -14794,7 +14836,7 @@ function drawProd(){
    chunkPanelHTML(d)+
    '<div class="row" style="margin-top:12px">'+
      '<button class="btn b" id="slow">🐢 慢速</button>'+
-     '<button class="btn b" id="humB">🎵 哼語調→唸</button>'+
+     '<button class="btn b" id="humB">🎵 先哼再唸</button>'+
      '<button class="btn b" id="spell">🔤 逐字母拼讀</button>'+
      '<button class="btn p" id="recBtn"><span class="rec" id="dot"></span>錄音跟讀</button>'+
      '<button class="btn g" id="pcard">🎨 色塊卡</button>'+
@@ -14808,7 +14850,7 @@ function drawProd(){
   box.querySelector("#prand").onclick=()=>{pi=Math.floor(Math.random()*L.length);drawProd();};
   box.querySelector("#say").onclick=()=>speak(d.b,0.9);
   box.querySelector("#slow").onclick=()=>speak(d.b,0.55);
-  box.querySelector("#humB").onclick=()=>humThenSpeak(d.b,d.ipa);
+  box.querySelector("#humB").onclick=e=>humThenSpeak(d.b,d.ipa,e.currentTarget);
   box.querySelector("#spell").onclick=()=>speak(d.b.split("").join(" ")+" ... "+d.b,0.6);
   bindChunkPanel(box);
   box.querySelectorAll(".syl.ltr .lt").forEach(sp=>sp.onclick=()=>{
@@ -14955,7 +14997,7 @@ function drawRecv(){
    '<div class="row" style="margin-bottom:10px">'+
      '<button class="btn b" id="rsay">🔊 聽發音</button>'+
      '<button class="btn b" id="rslow">🐢 慢速</button>'+
-     '<button class="btn b" id="rhum">🎵 哼語調→唸</button>'+
+     '<button class="btn b" id="rhum">🎵 先哼再唸</button>'+
      '<button class="btn b" id="rspell">🔤 逐字母拼讀</button>'+
      '<button class="btn g" id="rtip">💡 提示</button><button class="btn g" id="rcard">🎨 色塊卡</button></div>'+
    '<div class="fb'+(showW?" on":"")+'" id="rclue">'+(showW?'這個字很長（'+d.w.length+' 個字母），直接給你看：<b style="font-family:Georgia,serif">'+d.w+'</b>':'')+'</div>'+
@@ -14968,7 +15010,7 @@ function drawRecv(){
   const slot=box.querySelector("#slot");
   box.querySelector("#rsay").onclick=()=>speak(d.b,0.85);
   box.querySelector("#rslow").onclick=()=>speak(d.b,0.5);
-  box.querySelector("#rhum").onclick=()=>humThenSpeak(d.b,d.ipa);
+  box.querySelector("#rhum").onclick=e=>humThenSpeak(d.b,d.ipa,e.currentTarget);
   box.querySelector("#rspell").onclick=()=>speak(d.b.split("").join(" ")+" ... "+d.b,0.6);
   box.querySelector("#rcard").onclick=()=>openCard(d.w);
   box.querySelector("#rtip").onclick=()=>{
@@ -15213,13 +15255,13 @@ function drawFlowWord(){
       '<div class="word">'+d.w+'</div>'+
       '<div style="color:var(--pink-deep);font-weight:600">'+d.zh+'</div>'+
       '<div class="ipa">'+kkD(d.ipa)+'　<span class="count">'+POSN[d.p]+'・Level '+d.lv+'</span></div>'+zbMini(d)+
-      '<div class="syl">'+syl.map((x,i)=>'<span data-i="'+i+'" class="'+(i===st?"st":"")+'">'+x+'</span>').join("")+'</div>'+
+      '<div class="syl">'+syl.map((x,i)=>'<span data-i="'+i+'" class="'+(i===st?"st":"")+'">'+esc(kkP(x))+'</span>').join("")+'</div>'+
       '<div class="rhy"><span class="lab">手勢：</span>'+syl.map((x,i)=>'<button class="hand'+(i===st?" fist":"")+((x.indexOf("ə")>=0&&i!==st)?" schwa":"")+'" data-i="'+i+'">'+(i===st?"✊":"✋")+'</button>').join("")+'</div>'+
       '<div class="count">'+(syl.length===1?'單音節＝<b>第 4 聲</b>下墜':'紅色音節＝<b>第 1 聲</b>高平，其餘＝<b>輕聲</b>')+'</div>'+
       tips.map(t=>'<div class="airflow"><b>氣流與口腔</b>'+t+'</div>').join("")+
       mor+
       '<div class="row" style="margin-top:10px"><button class="btn b" id="fsay">🔊 聽</button>'+
-      '<button class="btn b" id="fhum">🎵 哼語調→唸</button>'+
+      '<button class="btn b" id="fhum">🎵 先哼再唸</button>'+
       '<button class="btn g" id="fslow">🐢 慢速</button></div></div>';
   }else{
     box.innerHTML='<div class="grp"><h4>弛 ｜ 不要看，讓它自己來</h4>'+
@@ -15237,7 +15279,7 @@ function drawFlowWord(){
   }
   const say=box.querySelector("#fsay"); if(say)say.onclick=()=>speak(d.b,0.9);
   const sl=box.querySelector("#fslow"); if(sl)sl.onclick=()=>speak(d.b,0.55);
-  const fh=box.querySelector("#fhum"); if(fh)fh.onclick=()=>humThenSpeak(d.b,d.ipa);
+  const fh=box.querySelector("#fhum"); if(fh)fh.onclick=e=>humThenSpeak(d.b,d.ipa,e.currentTarget);
   box.querySelectorAll(".syl span").forEach(sp=>sp.onclick=()=>{
     sp.classList.add("hit"); setTimeout(()=>sp.classList.remove("hit"),300);
     toneBeat(+sp.dataset.i,st,syl.length);
@@ -15732,11 +15774,10 @@ function legendHTML(){
 /* 外部工具：英文口說一點通（先複製句子，再開新分頁） */
 const FS_URL="https://sor-tone.web.app/";
 function fsOpen(text){
-  const w=window.open(FS_URL,"_blank","noopener");
+  /* 開啟由 <a target=_blank> 負責（點擊當下就開，不會被擋），這裡只負責複製句子 */
   const done=()=>toast("已複製：<b>"+esc(text)+"</b><br>到「英文口說一點通」貼上（長按或 Ctrl+V）就能看音高與語速。",5200);
   if(text&&navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done).catch(()=>toast("請在「英文口說一點通」輸入：<b>"+esc(text)+"</b>",6000));
   else if(text)toast("請在「英文口說一點通」輸入：<b>"+esc(text)+"</b>",6000);
-  if(!w)toast('瀏覽器擋住了新分頁，請<a href="'+FS_URL+'" target="_blank" rel="noopener">點這裡開啟</a>。',6000);
 }
 
 </script>
@@ -15796,7 +15837,7 @@ function drawCard(){
   }else if(cLayer==="s"){
     const groups=[]; if(r)r.chunks.forEach(c=>{groups[c.s]=(groups[c.s]||"")+c.g;});
     const sy=sylOf(x.ipa);
-    body='<div class="syl" style="flex-wrap:wrap">'+sy.syl.map((s,i)=>'<span data-i="'+i+'" class="'+(i===sy.st?"st":"")+'">'+esc(groups[i]||"")+'<small style="display:block;font-size:.7rem;opacity:.8">'+esc(s)+'</small></span>').join("")+'</div>'+
+    body='<div class="syl" style="flex-wrap:wrap">'+sy.syl.map((s,i)=>'<span data-i="'+i+'" class="'+(i===sy.st?"st":"")+'">'+esc(groups[i]||"")+'<small style="display:block;font-size:.7rem;opacity:.8">'+esc(kkP(s))+'</small></span>').join("")+'</div>'+
       '<div class="rhy"><span class="lab">手勢：</span>'+sy.syl.map((s,i)=>'<button class="hand'+(i===sy.st?" fist":"")+((s.indexOf("ə")>=0&&i!==sy.st)?" schwa":"")+'" data-i="'+i+'">'+(i===sy.st?"✊":"✋")+'</button>').join("")+'</div>'+
       '<div class="gexp">'+(sy.syl.length===1?'單音節字：整個字唸<b>國語第 4 聲</b>，高起、乾脆下墜。':'共 <b>'+sy.syl.length+'</b> 拍，重音在第 <b>'+(sy.st+1)+'</b> 拍。✊ 重音＝<b>國語第 1 聲</b>高平拉住；✋ 其他＝<b>輕聲</b>，低短輕。點方塊敲節拍。')+'</div>';
   }else{
@@ -15816,13 +15857,13 @@ function drawCard(){
    '<button class="btn b" id="csay">🔊 聽</button></div>'+zbMini(x)+
    '<div class="layer">'+[["g","🎨 形素色塊"],["z","🧱 注音積木"],["s","🥁 音節節拍"],["m","🧩 字首字根字尾"]].map(([k,n])=>'<button data-l="'+k+'" class="'+(cLayer===k?"on":"")+'">'+n+'</button>').join("")+'</div>'+
    body+'<div id="gex"></div>'+chunkPanelHTML(x)+
-   (COLL[x.w]?'<div class="fsbox"><div><b>🗣️ 英文口說一點通</b><span>把例句貼上去，看每個字的<b>發音、音高與語速</b>，說得更自然。</span></div>'+
-     '<button class="btn b sm" id="fsGo">📋 複製例句並開啟 ↗</button></div>':'')+
+   (COLL[x.w]?'<div class="fsbox"><div><a class="fslink" href="https://sor-tone.web.app/" target="_blank" rel="noopener" data-fs="1"><b>🗣️ 英文口說一點通 ↗</b></a><span>把例句貼上去，看每個字的<b>發音、音高與語速</b>，說得更自然。</span></div>'+
+     '<a class="btn b sm" id="fsGo" href="https://sor-tone.web.app/" target="_blank" rel="noopener">📋 複製例句並開啟 ↗</a></div>':'')+
    (()=>{ const H=typeof examHits==="function"?examHits(x):[]; if(!H.length)return '';
      return '<div class="exhit"><b>📜 這個字在學測出現過 '+H.length+' 次</b>'+H.slice(0,2).map(h=>'<div class="exs"><span class="exsrc">'+esc(h.src)+'</span><span class="exen">'+markIn(h.s,x)+'</span><button class="cb" data-exs="'+esc(h.s)+'" title="朗讀">🔊</button></div>').join("")+
        (H.length>2?'<button class="btn g sm" id="exMore">看全部 '+H.length+' 句（大考雷達）→</button>':'')+'</div>'; })()+
    '<div class="row" style="margin-top:12px">'+
-     '<button class="btn g" id="cslow">🐢 慢速</button><button class="btn g" id="chum">🎵 哼語調→唸</button>'+
+     '<button class="btn g" id="cslow">🐢 慢速</button><button class="btn g" id="chum">🎵 先哼再唸</button>'+
      '<button class="btn b" id="cspell">🧩 拼拼看</button><button class="btn p" id="cgym">🎙️ 練發音</button><button class="btn g" id="cradar">📡 雷達</button></div>'+
    '<div class="nav2"><button class="btn g" id="cprev">← 上一字</button><span class="count">Level '+cLv+'　'+(cI+1)+' / '+L.length+'</span>'+
    '<button class="btn g" id="cnext">下一字 →</button></div>';
@@ -15831,7 +15872,7 @@ function drawCard(){
   if(cLayer==="z")zbBindIn(box,x);
   box.querySelector("#csay").onclick=()=>speak(x.b,0.85);
   box.querySelector("#cslow").onclick=()=>speak(x.b,0.5);
-  box.querySelector("#chum").onclick=()=>humThenSpeak(x.b,x.ipa);
+  box.querySelector("#chum").onclick=e=>humThenSpeak(x.b,x.ipa,e.currentTarget);
   box.querySelector("#cspell").onclick=()=>{spScope={kind:"one",w:x.w};spNext(x);go("spell");};
   box.querySelector("#cgym").onclick=()=>{gymFor(x);go("gym");};
   box.querySelector("#cradar").onclick=()=>{rdWord=x;rdTab="w";go("radar");};
@@ -15848,7 +15889,7 @@ function drawCard(){
   bindChunkPanel(box);
   box.querySelectorAll("[data-exs]").forEach(b=>b.onclick=()=>speakThen(b.dataset.exs,0.9));
   const em=box.querySelector("#exMore"); if(em)em.onclick=()=>{ rdWord=x; rdTab="w"; go("radar"); };
-  const fs=box.querySelector("#fsGo"); if(fs)fs.onclick=()=>fsOpen(COLL[x.w].sent);
+  box.querySelectorAll("#fsGo,.fslink").forEach(a=>a.onclick=()=>fsOpen(COLL[x.w].sent));
   jumper(box,L,i=>{cWord=L[i];cSel=-1;drawCard();});
 }
 function showExamples(c,x){
@@ -16743,10 +16784,18 @@ function feats(x,sr){
 function pct(arr,p){const a=arr.slice().sort((x,y)=>x-y);return a[Math.min(a.length-1,Math.floor(p*a.length))]||0;}
 /* 分析一段「唸單字」的錄音：起音、聲帶開始震動的時間（VOT）、起始噪音長度 */
 function analyzeOnset(x,sr){
+  /* 自動增益：把整段錄音放大到峰值 0.6，iPhone 收音偏小也能分析 */
+  let rawMax=0; for(let i=0;i<x.length;i++){const a=Math.abs(x[i]); if(a>rawMax)rawMax=a;}
+  { const m=rawMax;
+    if(m>1e-4&&m<0.6){ const g=0.6/m, y=new Float32Array(x.length); for(let i=0;i<x.length;i++)y[i]=x[i]*g; x=y; } }
   const {F,ms}=feats(x,sr);
   if(F.length<20)return {ok:false,why:"錄音太短"};
-  const Es=F.map(f=>f.E), peak=Math.max(...Es), floor=Math.max(pct(Es,0.15),1e-9);
-  if(peak<floor*30||peak<1e-6)return {ok:false,why:"幾乎沒有收到聲音，請靠近麥克風再唸一次"};
+  const Es=F.map(f=>f.E), peak=Math.max(...Es), floor0=Math.max(pct(Es,0.15),1e-12);
+  /* 真的沒聲音：最大音量低於約 -54 dBFS，且幾乎沒有起伏 */
+  if(rawMax<0.002||(peak<4e-6&&peak<floor0*8))return {ok:false,why:"幾乎沒有收到聲音，請靠近麥克風再唸一次"};
+  if(peak<floor0*3)return {ok:false,why:"背景聲音太大，聽不出單字。請到安靜一點的地方，或把手機拿近一點再唸一次"};
+  /* 背景噪音偏高（手機麥克風、關掉自動增益時常見）：把噪音底限壓到峰值的 1/60，後面的相對門檻才不會失效 */
+  const floor=Math.min(floor0,peak/60);
   let on=-1;
   for(let i=0;i<F.length;i++){if(F[i].E>Math.max(floor*12,peak*0.004)){on=i;break;}}
   if(on<0)return {ok:false,why:"找不到起音"};
@@ -16779,10 +16828,7 @@ function liveFrame(buf,sr){
 /* ══════════ 麥克風 ══════════ */
 const MIC={st:null,src:null,an:null,pr:null,g:null,rec:false,buf:[],raf:0,floor:0.002};
 async function micOpen(){
-  /* iPhone／iPad：音訊引擎必須在「按下按鈕的那一刻」就啟動，等麥克風授權（await）之後才啟動會被擋下，
-     結果錄到的是空的（顯示「錄音太短」）。所以先在這裡同步喚醒。 */
-  try{ ac(); }catch(e){}
-  if(MIC.st){ await micWake(); return true; }
+  if(MIC.st)return true;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){labMsg('這個瀏覽器不能使用麥克風。請用 Chrome、Edge 或 Safari 開啟（iPhone 需 iOS 14.3 以上）。');return false;}
   try{
     MIC.st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
@@ -16790,17 +16836,14 @@ async function micOpen(){
     labMsg('無法使用麥克風（'+(e.name==="NotAllowedError"?"權限被拒絕 — 請在瀏覽器網址列左側或系統設定開啟麥克風權限":esc(e.name))+'）。');return false;
   }
   try{
-    const A=ac(); MIC.src=A.createMediaStreamSource(MIC.st);
+    const A=ac(); try{ if(A.state!=="running")await A.resume(); }catch(e){}
+    MIC.src=A.createMediaStreamSource(MIC.st);
     MIC.an=A.createAnalyser(); MIC.an.fftSize=2048; MIC.src.connect(MIC.an);
     MIC.pr=A.createScriptProcessor(2048,1,1); MIC.g=A.createGain(); MIC.g.gain.value=0;
     MIC.src.connect(MIC.pr); MIC.pr.connect(MIC.g); MIC.g.connect(A.destination);
     MIC.pr.onaudioprocess=e=>{if(MIC.rec)MIC.buf.push(new Float32Array(e.inputBuffer.getChannelData(0)));};
   }catch(e){labMsg('音訊引擎啟動失敗：'+esc(e.message||e));micClose();return false;}
-  await micWake();
   return true;
-}
-async function micWake(){
-  try{ const A=ac(); if(A.state!=="running") await Promise.race([A.resume(),new Promise(r=>setTimeout(r,800))]); }catch(e){}
 }
 function micClose(){
   cancelAnimationFrame(MIC.raf); MIC.raf=0;
@@ -16808,43 +16851,9 @@ function micClose(){
   try{MIC.src&&MIC.src.disconnect();MIC.pr&&MIC.pr.disconnect();MIC.g&&MIC.g.disconnect();}catch(e){}
   MIC.st=null;MIC.src=null;MIC.an=null;MIC.pr=null;MIC.rec=false;
 }
-/* 錄一段聲音給分析用。主要靠 ScriptProcessor 收樣本；
-   有些手機（特別是 iPhone Safari）它會收不到或只收到一點點，
-   所以同時用 MediaRecorder 錄一份，必要時解碼那一份來分析。 */
 function micRecord(sec){
-  return new Promise(res=>{
-    MIC.buf=[];MIC.rec=true;
-    let mr=null, chunks=[];
-    try{
-      if(window.MediaRecorder&&MIC.st){
-        const types=["audio/webm;codecs=opus","audio/mp4","audio/webm","audio/aac"];
-        const mt=types.find(t=>{try{return MediaRecorder.isTypeSupported(t);}catch(e){return false;}});
-        mr=mt?new MediaRecorder(MIC.st,{mimeType:mt}):new MediaRecorder(MIC.st);
-        mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
-        mr.start();
-      }
-    }catch(e){mr=null;}
-    setTimeout(()=>{
-      MIC.rec=false;
-      const n=MIC.buf.reduce((a,b)=>a+b.length,0),x=new Float32Array(n);let o=0;MIC.buf.forEach(b=>{x.set(b,o);o+=b.length;});
-      const sr=ac().sampleRate;
-      if(x.length>=sr*sec*0.6||!mr){ try{mr&&mr.state!=="inactive"&&mr.stop();}catch(e){} res(x); return; }
-      /* ScriptProcessor 收得不夠：改解碼 MediaRecorder 那一份 */
-      mr.onstop=async()=>{
-        try{
-          const ab=await new Blob(chunks,{type:mr.mimeType||"audio/mp4"}).arrayBuffer();
-          const buf=await new Promise((ok,bad)=>{const p=ac().decodeAudioData(ab,ok,bad); if(p&&p.then)p.then(ok,bad);});
-          let y=buf.getChannelData(0);
-          if(buf.sampleRate!==sr){ /* 換成分析用的取樣率 */
-            const r=buf.sampleRate/sr, m=Math.floor(y.length/r), z=new Float32Array(m);
-            for(let i=0;i<m;i++)z[i]=y[Math.floor(i*r)]; y=z;
-          }
-          res(y.length>x.length?y:x);
-        }catch(e){ res(x); }
-      };
-      try{ mr.stop(); }catch(e){ res(x); }
-    },sec*1000);
-  });
+  return new Promise(res=>{MIC.buf=[];MIC.rec=true;
+    setTimeout(()=>{MIC.rec=false;const n=MIC.buf.reduce((a,b)=>a+b.length,0),x=new Float32Array(n);let o=0;MIC.buf.forEach(b=>{x.set(b,o);o+=b.length;});res(x);},sec*1000);});
 }
 function micLive(cb){
   cancelAnimationFrame(MIC.raf);
@@ -16959,7 +16968,6 @@ async function airGo(){
   const a=analyzeOnset(sig,ac().sampleRate);
   airBusy=false; btn.disabled=false; cue.innerHTML="再試一次，或換一個字";
   const res=$("labRes");
-  if(!a.ok&&sig.length<ac().sampleRate*0.3){res.className="result on meh";res.innerHTML="🤔 沒有收到麥克風的聲音。請確認：① 瀏覽器已允許使用麥克風；② 沒有其他 App 正在用麥克風（例如通話、錄音）；③ iPhone 請用 Safari 開啟，再按一次 🎙️。";return;}
   if(!a.ok){res.className="result on meh";res.innerHTML="🤔 "+esc(a.why)+"。";return;}
   let good=false, msg="";
   const tl=(v,max,zones)=>'<div style="position:relative;height:16px;background:var(--cream2);border-radius:99px;margin:8px 0 2px;overflow:hidden">'+
@@ -19599,9 +19607,14 @@ function sgPlay(rate){
   }else if(SG.mode==="hum"){
     /* 唱：球球直接看「音訊時鐘」，和哼唱的每個音一起走 */
     let A=null; try{A=ac();}catch(e){}
-    const t0=A?A.currentTime+0.12:0; sgHum(T,t0);
-    const p0=performance.now()+120;
-    clock=()=>{ const t=A&&A.state==="running"?A.currentTime-t0:(performance.now()-p0)/1000;
+    const a0=A?A.currentTime:0, t0=a0+0.12; sgHum(T,t0);
+    const p0=performance.now()+120; let useA=null;
+    if(msg)msg.innerHTML="🎵 跟著球球用「da」哼：球球跳<b>高</b>就唱高、拉長，跳<b>低</b>就輕輕帶過～";
+    clock=()=>{ const tp=(performance.now()-p0)/1000;
+      /* 音訊時鐘有在走才用它；0.35 秒內沒動就改用畫面時鐘，球球照樣前進 */
+      if(useA===null&&A){ if(A.state==="running"&&A.currentTime-a0>0.03)useA=true; else if(tp>0.23){ useA=false;
+        if(msg)msg.innerHTML="🎵 跟著球球用「da」哼出高低！<br><small>沒聽到哼唱聲嗎？iPhone 請把側邊的<b>靜音鍵</b>關掉、調大音量，再按一次開始。</small>"; } }
+      const t=useA?A.currentTime-t0:tp;
       if(t<0)return {i:0,f:0,wait:true}; if(t>=total)return {i:N-1,f:1,done:t>=total+0.15};
       let i=T.findIndex(x=>t<x.t+x.d); if(i<0)i=N-1; return {i:i,f:Math.min(1,(t-T[i].t)/T[i].d)}; };
   }else{
