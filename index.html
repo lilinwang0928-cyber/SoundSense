@@ -2255,6 +2255,10 @@ html[data-theme="dark"] .gdvoice{background:var(--paper);border-color:#3a4c66}
   音標與音節切分由 CMU Pronouncing Dictionary 推導；形素色塊由程式自動對齊，約 2% 例外拼字另行標示。
 </footer>
 
+<script>
+/* 唸字母名：用大寫送給語音（A 唸 /e/、I 唸 /aɪ/），不會被當成冠詞 a 或羅馬數字 */
+function letterName(c){ c=String(c||"").trim(); return /^[a-z]$/i.test(c)?c.toUpperCase():c; }
+</script>
 <script>/* ══════════ 英語語音：自動選「美式或英式英語、最接近真人」的瀏覽器語音 ══════════
    評分：自然／神經網路語音（Edge Natural、Google、Siri／加強版）> 一般真人錄製語音 > 其他；
    排除 macOS／iOS 的趣味機器人聲（Albert、Bubbles、Zarvox…）與 Eloquence 系列（Eddy、Flo…）。
@@ -2280,6 +2284,7 @@ function vScore(v,acc){
   if(/Google/i.test(n))s+=10;
   if(acc==="gb"?(isGB&&V_GB.test(v.name)):V_GOOD.test(v.name))s+=30;
   if(v.localService)s+=4;
+  if(/network/i.test(n)&&/Android/i.test(navigator.userAgent||""))s-=45;
   if(v.default)s+=2;
   return s;
 }
@@ -2319,15 +2324,93 @@ if("speechSynthesis" in window){
   try{ speechSynthesis.addEventListener("voiceschanged",refresh); }catch(e){ speechSynthesis.onvoiceschanged=refresh; }
   speechSynthesis.getVoices();
   /* 所有英文朗讀自動換成最自然的美式語音（中文語音不受影響） */
+  /* ── 安卓相容層 ──
+     1) 安卓 Chrome 在 cancel() 之後立刻 speak() 常常整句被吞掉 → cancel 後稍等 0.15 秒再唸（多句依序排隊）
+     2) 有些安卓語音引擎回報的語言是 en_US（底線），直接寫回 u.lang 會沒聲音 → 一律改成 en-US
+     3) 語音引擎卡住（speaking 卡在 true、沒有任何事件）→ 1.8 秒後自動重來一次，改用系統預設聲音
+     4) 選到的聲音不能用（synthesis-failed／voice-unavailable…）→ 換系統預設聲音重唸一次
+     5) 還是沒聲音 → 跳出安卓設定提示（一次） */
+  const IS_ANDROID=/Android/i.test(navigator.userAgent||"");
   const _origSpeak=speechSynthesis.speak.bind(speechSynthesis);
-  speechSynthesis.speak=function(u){
-    try{ const lang=(u&&u.lang)||"en-US";
-      if(u&&/^en/i.test(lang)){ const v=enVoice(); if(v){ u.voice=v; u.lang=v.lang; } }
-      else if(u&&/^(zh|cmn)/i.test(lang)){ const v=zhVoice(); if(v){ u.voice=v; u.lang=v.lang; } }
-      /* 一律用正常音高，不把聲音調尖 */
-      if(u)u.pitch=1; }catch(e){}
-    return _origSpeak(u);
+  const _origCancel=speechSynthesis.cancel.bind(speechSynthesis);
+  const normLang=l=>String(l||"").replace(/_/g,"-");
+  let _cancelT=0, _waitQ=[], _waitTimer=0, _pend=[], _act=0, _dog=0, _keep=[], _gen=0;
+  window._ttsOK=false;
+  const mark=()=>{ _act=Date.now(); };
+  function copyU(u){
+    const r=new SpeechSynthesisUtterance(u.text);
+    r.rate=u.rate; r.volume=u.volume; r.pitch=1;
+    r.lang=/^(zh|cmn)/i.test(u.lang||"")?"zh-TW":(/^en/i.test(u.lang||"en")?(voiceAccent()==="gb"?"en-GB":"en-US"):normLang(u.lang));
+    r._on=u._on; r._retried=true; return r;
+  }
+  function ttsFail(){
+    if(window._ttsTipShown)return; window._ttsTipShown=true;
+    if(typeof toast!=="function")return;
+    toast(IS_ANDROID
+      ?'🔇 這支安卓手機的朗讀沒有出聲。<br>請到 <b>設定 →（協助工具／一般管理）→ 文字轉語音輸出</b>：偏好引擎選 <b>Google</b>，並下載「英文（美國）」與「中文（台灣）」語音資料；再回來按 🔄 重新整理。<br>若是從 LINE／FB 打開，請改用 <b>Chrome</b> 開啟。'
+      :'🔇 朗讀沒有出聲：請調大音量、改用 Safari／Chrome 開啟，再按 🔄 重新整理。',9000);
+  }
+  function bind(u){
+    /* 把頁面原本掛的 onstart/onend/onerror 收起來，由這裡統一轉交，重唸時才不會重複觸發 */
+    if(!u._on){ u._on={s:u.onstart,e:u.onend,r:u.onerror,b:u.onboundary}; }
+    const on=u._on;
+    u.onstart=e=>{ if(u._dead)return; mark(); window._ttsOK=true; _pend=_pend.filter(x=>x!==u); if(on.s)on.s.call(u,e); };
+    u.onboundary=e=>{ if(u._dead)return; mark(); if(on.b)on.b.call(u,e); };
+    u.onend=e=>{ if(u._dead)return; u._dead=true; mark(); _pend=_pend.filter(x=>x!==u); if(on.e)on.e.call(u,e); };
+    u.onerror=e=>{ if(u._dead)return; const er=e&&e.error;
+      _pend=_pend.filter(x=>x!==u);
+      if(er!=="interrupted"&&er!=="canceled"&&!u._retried&&!u._started){
+        /* 這個聲音不能用：換預設聲音重唸，原本的 onerror 先不觸發 */
+        u._dead=true; const r=copyU(u); go1(r,true); return; }
+      u._dead=true; if(er!=="interrupted"&&er!=="canceled"&&u._retried)ttsFail();
+      if(on.r)on.r.call(u,e); else if(on.e)on.e.call(u,e); };
+    u.addEventListener("start",()=>{ u._started=true; });
+  }
+  function prep(u){
+    const lang=normLang((u&&u.lang)||"en-US");
+    if(!u._retried){
+      if(/^en/i.test(lang)){ const v=enVoice(); if(v){ u.voice=v; u.lang=normLang(v.lang)||"en-US"; } else u.lang=lang; }
+      else if(/^(zh|cmn)/i.test(lang)){ const v=zhVoice(); if(v){ u.voice=v; u.lang=normLang(v.lang)||"zh-TW"; } else u.lang=lang; }
+      else u.lang=lang;
+    }
+    /* 一律用正常音高，不把聲音調尖 */
+    u.pitch=1;
+  }
+  function watch(){
+    clearTimeout(_dog); const g=_gen, t0=Date.now();
+    _dog=setTimeout(()=>{
+      if(g!==_gen||!_pend.length||_act>=t0)return;      /* 有動靜或已被取消 → 沒事 */
+      const todo=_pend.filter(u=>!u._retried&&!u._dead);
+      if(!todo.length){ _pend=[]; ttsFail(); return; }
+      /* 引擎卡住：重置後用系統預設聲音依序重唸 */
+      todo.forEach(u=>u._dead=true); _pend=[];
+      try{ _origCancel(); }catch(e){}
+      setTimeout(()=>{ if(g!==_gen)return; todo.forEach(u=>go1(copyU(u),true)); },120);
+    },1800);
+  }
+  function go1(u,isRetry){
+    try{ prep(u); bind(u); }catch(e){}
+    _keep.push(u); if(_keep.length>40)_keep.shift();       /* 留住參照，避免 onend 被回收而不觸發 */
+    _pend.push(u);
+    try{ if(speechSynthesis.paused)speechSynthesis.resume(); }catch(e){}
+    try{ _origSpeak(u); }catch(e){ _pend=_pend.filter(x=>x!==u); if(!isRetry){ go1(copyU(u),true); return; } ttsFail(); return; }
+    watch();
+  }
+  function flush(){ _waitTimer=0; const q=_waitQ; _waitQ=[]; q.forEach(u=>go1(u)); }
+  speechSynthesis.cancel=function(){
+    _cancelT=Date.now(); _gen++; clearTimeout(_dog);
+    _pend.forEach(u=>u._dead=true); _pend=[];
+    if(_waitTimer){ clearTimeout(_waitTimer); _waitTimer=0; _waitQ=[]; }
+    try{ return _origCancel(); }catch(e){}
   };
+  speechSynthesis.speak=function(u){
+    if(!u)return;
+    const gap=Date.now()-_cancelT;
+    if(_waitTimer){ _waitQ.push(u); return; }                 /* 前面還在等 → 排在後面，順序不亂 */
+    if(IS_ANDROID&&gap<150){ _waitQ.push(u); _waitTimer=setTimeout(flush,150-gap); return; }
+    go1(u);
+  };
+  window._ttsTest=()=>({android:IS_ANDROID,ok:window._ttsOK,pend:_pend.length,voices:speechSynthesis.getVoices().length});
 }
 /* 學習護照裡的語音設定卡 */
 function voiceCardRender(){
@@ -2351,13 +2434,26 @@ function voiceCardRender(){
         L.map(v=>'<option value="'+esc(v.voiceURI||v.name)+'"'+(want&&(v.voiceURI===want||v.name===want)?" selected":"")+'>'+tag(v)+' '+esc(v.name)+'</option>').join("")+'</select>'+
       '<button class="btn b" id="voiceTry">▶ 試聽英文</button></div>'+
       '<p style="margin:12px 0 0">中文語音：<b>'+esc(zhVoice()?zhVoice().name:"瀏覽器預設")+'</b>（自動選臺灣華語、最接近真人的聲音，正常音高）<button class="btn g sm" id="voiceTryZh" style="margin-left:6px">▶ 試聽中文</button></p>'+
-      '<p class="count" style="margin-top:10px">📌 單字的 KK 音標與發音教學以<b>美式英語</b>為準；英式英語適合練聽力、比較兩種口音的差異。<br>💡 想要更自然的聲音？<br>・iPhone／iPad：設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文 → 下載「Ava／Evan（加強版）」（美式）或「Serena／Daniel（加強版）」（英式）；中文 → 下載「美佳（加強版）」。回來按 🔄 重新整理。<br>・電腦：Edge 瀏覽器內建「Microsoft … Online (Natural)」真人語音（美式 Aria、Guy；英式 Sonia、Ryan），效果最好；Chrome 會用「Google US／UK English」。</p>'
-    :'<p class="lead">這個瀏覽器目前沒有提供英語語音。請改用 Safari、Chrome 或 Edge。</p>');
+      (/Android/i.test(navigator.userAgent||"")?'<p class="warnbox" style="margin:10px 0 0">🤖 <b>安卓手機沒聲音？</b>①用 <b>Chrome</b> 開啟（不要用 LINE／FB 內建瀏覽器）②手機 <b>設定 →（協助工具／一般管理）→ 文字轉語音輸出</b>：偏好引擎選 <b>Google</b>，下載「英文（美國）」「中文（台灣）」語音資料 ③調大<b>媒體音量</b>（不是鈴聲音量）④回來按 🔄 重新整理。</p>':'')+'<p class="count" style="margin-top:10px">📌 單字的 KK 音標與發音教學以<b>美式英語</b>為準；英式英語適合練聽力、比較兩種口音的差異。<br>💡 想要更自然的聲音？<br>・iPhone／iPad：設定 → 輔助使用 → 朗讀內容 → 聲音 → 英文 → 下載「Ava／Evan（加強版）」（美式）或「Serena／Daniel（加強版）」（英式）；中文 → 下載「美佳（加強版）」。回來按 🔄 重新整理。<br>・電腦：Edge 瀏覽器內建「Microsoft … Online (Natural)」真人語音（美式 Aria、Guy；英式 Sonia、Ryan），效果最好；Chrome 會用「Google US／UK English」。</p>'
+    :'<p class="lead">這個瀏覽器目前沒有提供英語語音。請改用 Safari、Chrome 或 Edge。</p>'+(/Android/i.test(navigator.userAgent||"")?'<p class="warnbox">🤖 安卓手機：設定 →（協助工具／一般管理）→ 文字轉語音輸出 → 偏好引擎選 <b>Google</b>，下載「英文（美國）」「中文（台灣）」語音資料，再回來按 🔄 重新整理。</p>':''));
   c.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>{ try{ localStorage.setItem(ACCENT_KEY,b.dataset.acc); }catch(e){} _enV=null; voiceCardRender(); speak(b.dataset.acc==="gb"?"Hello! This is British English.":"Hello! This is American English.",0.9); });
   const sel=c.querySelector("#voiceSel"); if(sel)sel.onchange=()=>{ try{ if(sel.value)localStorage.setItem(KEY,sel.value); else localStorage.removeItem(KEY); }catch(e){} _enV=null; voiceCardRender(); speak(say,0.9); };
   const tz=c.querySelector("#voiceTryZh"); if(tz)tz.onclick=()=>{ if("speechSynthesis" in window){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance("一起把英文唸得自然又好聽！"); u.lang="zh-TW"; speechSynthesis.speak(u); } };
   const t=c.querySelector("#voiceTry"); if(t)t.onclick=()=>speak(say,0.9);
 }
+
+/* LINE／FB／IG 等 App 內建瀏覽器常常不支援朗讀 → 開頁時提醒改用 Chrome／Safari */
+(function(){
+  const ua=navigator.userAgent||"";
+  const inApp=/\bLine\/|FBAN|FBAV|Instagram|MicroMessenger|; wv\)/i.test(ua);
+  const noTTS=!("speechSynthesis" in window)||typeof SpeechSynthesisUtterance==="undefined";
+  if(!inApp&&!noTTS)return;
+  window.addEventListener("load",()=>setTimeout(()=>{
+    if(typeof toast!=="function")return;
+    const and=/Android/i.test(ua);
+    toast('🔇 目前是在 <b>'+(inApp?'App 內建瀏覽器':'不支援朗讀的瀏覽器')+'</b> 開啟，可能按了沒有聲音。<br>請點右上角「⋮」或「…」→ <b>'+(and?'用 Chrome 開啟':'用 Safari 開啟')+'</b>。',10000);
+  },900));
+})();
 </script>
 <script>
 /* ══ KK 音標顯示：字庫存的是 IPA（對位、音節計算都靠它），顯示時一律轉成台灣通用的 KK ══ */
@@ -14953,7 +15049,7 @@ const TTS_SAY={
  "read the news":"red the news"
 };
 function ttsFix(t){ t=String(t==null?"":t); if(TTS_SAY[t.trim()])t=TTS_SAY[t.trim()];
-  { const lone=t.trim().toLowerCase().replace(/[.!?]$/,""); if(lone==="a")return "uh"; if(/^a\s*\/\s*an$/.test(lone))return "uh, an"; }
+  { const raw=t.trim().replace(/[.!?]$/,""), lone=raw.toLowerCase(); if(raw==="a")return "uh"; if(/^a\s*\/\s*an$/.test(lone))return "uh, an"; }
   { const T=t.trim(), I=w=>w==="I"?"eye":w;
     if(T==="I")return "eye";
     let m=T.match(/^([A-Za-z’']+) \(([^)]*)\)$/);
@@ -15129,11 +15225,11 @@ function drawProd(){
   box.querySelector("#say").onclick=()=>speak(d.b,0.9);
   box.querySelector("#slow").onclick=()=>speak(d.b,0.55);
   box.querySelector("#humB").onclick=e=>humThenSpeak(d.b,d.ipa,e.currentTarget);
-  box.querySelector("#spell").onclick=()=>speak(d.b.split("").join(" ")+" ... "+d.b,0.6);
+  box.querySelector("#spell").onclick=()=>speak(d.b.split("").filter(c=>/[a-z]/i.test(c)).map(letterName).join(", ")+" ... "+ttsFix(d.b),0.6);
   bindChunkPanel(box);
   box.querySelectorAll(".syl.ltr .lt").forEach(sp=>sp.onclick=()=>{
     sp.classList.add("hit"); setTimeout(()=>sp.classList.remove("hit"),300);
-    beat(false); speak(sp.dataset.c,0.75);
+    beat(false); speak(letterName(sp.dataset.c),0.75);
   });
   let cutPos=0;
   const ctl=box.querySelector("#cutCtl");
@@ -15289,7 +15385,7 @@ function drawRecv(){
   box.querySelector("#rsay").onclick=()=>speak(d.b,0.85);
   box.querySelector("#rslow").onclick=()=>speak(d.b,0.5);
   box.querySelector("#rhum").onclick=e=>humThenSpeak(d.b,d.ipa,e.currentTarget);
-  box.querySelector("#rspell").onclick=()=>speak(d.b.split("").join(" ")+" ... "+d.b,0.6);
+  box.querySelector("#rspell").onclick=()=>speak(d.b.split("").filter(c=>/[a-z]/i.test(c)).map(letterName).join(", ")+" ... "+ttsFix(d.b),0.6);
   box.querySelector("#rcard").onclick=()=>openCard(d.w);
   box.querySelector("#rtip").onclick=()=>{
     const c=box.querySelector("#rclue");
@@ -20167,6 +20263,7 @@ function drawGuide(){
    '<div class="gdsec" id="g7"><h3>⑦ 常見問題</h3><div class="gdfaq">'+
      '<details><summary>按了沒有反應？</summary><p>大多是用 LINE 或檔案 App「預覽」打開的。請改用 Safari／Chrome 開啟，或先按右上角 🔄 重新整理。</p></details>'+
      '<details><summary>沒有聲音？</summary><p>調大音量；確認沒有開藍牙耳機卻沒戴上。iPhone 靜音鍵只會讓「哼唱、節拍器」沒聲音，朗讀照常。還是沒聲音就按 🔄 重新整理。</p></details>'+
+     '<details open><summary>🤖 安卓手機按了沒聲音？</summary><p>① 用 <b>Chrome</b> 開啟（LINE、FB 內建瀏覽器常常不能朗讀：點右上角「⋮」→ 用 Chrome 開啟）。<br>② 調大<b>媒體音量</b>（按音量鍵時，調的是「媒體」不是鈴聲）。<br>③ 手機 <b>設定 →（協助工具／一般管理）→ 文字轉語音輸出</b>：偏好引擎選 <b>Google</b>，並下載「英文（美國）」「中文（台灣）」語音資料。三星手機請把「Samsung 文字轉語音」改成 Google。<br>④ 回到 SoundSense 按 🔄 重新整理，到「學習護照 → 語音設定」按 ▶ 試聽英文確認。</p></details>'+
      '<details><summary>錄音說「沒有收到聲音」？</summary><p>確認瀏覽器已允許麥克風（網址列旁的鎖頭圖示 → 麥克風 → 允許），把手機拿近一點再唸一次。</p></details>'+
      '<details><summary>語音唸起來像機器人？</summary><p>照上面「⑥ 更改語音」下載加強版聲音，或在學習護照的語音卡片換一個聲音試聽。</p></details>'+
      '<details><summary>學習紀錄不見了？</summary><p>紀錄存在這台裝置的瀏覽器裡。換瀏覽器、無痕模式或清除瀏覽資料都會看不到原本的紀錄。</p></details>'+
