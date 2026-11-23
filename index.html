@@ -1665,87 +1665,6 @@ html[data-theme="dark"] .gdhero{background:linear-gradient(135deg,#1f2833,#2b241
 html[data-theme="dark"] .gdvoice{background:var(--paper);border-color:#3a4c66}
 
 </style>
-<style id="ssDlgCss">
-/* ══════════ 新對話框（取代瀏覽器 alert／confirm／prompt）══════════ */
-.ssdlg{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;
-  background:rgba(31,40,58,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;transition:opacity .2s}
-.ssdlg.on{opacity:1}
-.ssdlg-card{width:100%;max-width:400px;background:var(--paper);color:var(--ink);border-radius:20px;padding:20px 20px 16px;
-  border:1px solid var(--cream2);box-shadow:0 20px 50px rgba(20,30,60,.3);transform:translateY(14px) scale(.97);transition:transform .25s cubic-bezier(.2,.9,.3,1.2);
-  font-family:"Noto Sans TC",sans-serif}
-.ssdlg.on .ssdlg-card{transform:none}
-.ssdlg-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.ssdlg-ic{width:38px;height:38px;flex:0 0 38px;border-radius:12px;display:grid;place-items:center;font-size:1.2rem;background:var(--blue-soft)}
-.ssdlg[data-kind="ok"] .ssdlg-ic{background:var(--green-soft,#E4F3EA)}
-.ssdlg[data-kind="warn"] .ssdlg-ic{background:var(--orange-soft,#FBE7D3)}
-.ssdlg[data-kind="danger"] .ssdlg-ic{background:var(--pink-soft)}
-.ssdlg-tt{font-weight:800;font-size:1rem}
-.ssdlg-msg{font-size:.92rem;line-height:1.65;color:var(--ink);white-space:pre-line;margin:2px 0 4px}
-.ssdlg-in{width:100%;margin-top:10px;padding:10px 12px;border-radius:12px;border:2px solid var(--cream2);background:var(--cream);color:var(--ink);font:inherit;font-size:.95rem;outline:none}
-.ssdlg-in:focus{border-color:var(--blue)}
-.ssdlg-ft{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-.ssdlg-b{border:0;border-radius:12px;padding:10px 18px;font:inherit;font-weight:700;font-size:.9rem;cursor:pointer;min-width:84px}
-.ssdlg-b.no{background:var(--cream2);color:var(--ink)}
-.ssdlg-b.yes{background:var(--blue);color:#fff}
-.ssdlg[data-kind="danger"] .ssdlg-b.yes{background:var(--pink-deep)}
-html[data-theme="dark"] .ssdlg[data-kind="danger"] .ssdlg-b.yes{background:#B34460}
-.ssdlg-b:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){.ssdlg,.ssdlg-card{transition:none}}
-.aibox{margin-top:10px;padding:12px 14px;border-radius:14px;background:var(--vio-soft);border:1.5px solid var(--cream2)}
-.aihd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.aisw{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:700;cursor:pointer}
-.aisw input{width:18px;height:18px;accent-color:var(--vio)}
-.aiprog{height:8px;border-radius:99px;background:var(--cream2);overflow:hidden;margin-top:8px}
-.aiprog i{display:block;height:100%;background:var(--vio);transition:width .4s}
-</style>
-<script id="ssDlgJs">
-/* ssAlert(msg,opt) / ssConfirm(msg,opt) / ssPrompt(msg,def,opt) 皆回傳 Promise */
-(function(){
-  const ICON={info:"💬",ok:"✅",warn:"⚠️",danger:"🗑️",ask:"✏️"};
-  const TITLE={info:"提醒",ok:"完成",warn:"請注意",danger:"確認刪除",ask:"請輸入"};
-  const q=[]; let busy=false;
-  function run(){
-    if(busy||!q.length)return; busy=true;
-    const d=q.shift(), kind=d.opt.kind||(d.type==="prompt"?"ask":"info");
-    const last=document.activeElement;
-    const o=document.createElement("div"); o.className="ssdlg"; o.dataset.kind=kind;
-    o.setAttribute("role",d.type==="alert"?"alertdialog":"dialog"); o.setAttribute("aria-modal","true");
-    const c=document.createElement("div"); c.className="ssdlg-card";
-    const hd=document.createElement("div"); hd.className="ssdlg-hd";
-    const ic=document.createElement("div"); ic.className="ssdlg-ic"; ic.textContent=d.opt.icon||ICON[kind]||"💬";
-    const tt=document.createElement("div"); tt.className="ssdlg-tt"; tt.id="ssdlgT"+Date.now(); tt.textContent=d.opt.title||TITLE[kind]||"提醒";
-    hd.append(ic,tt); o.setAttribute("aria-labelledby",tt.id);
-    const m=document.createElement("div"); m.className="ssdlg-msg"; m.textContent=d.msg; c.append(hd,m);
-    let inp=null;
-    if(d.type==="prompt"){ inp=document.createElement("input"); inp.className="ssdlg-in"; inp.type="text"; inp.value=d.def==null?"":d.def; inp.setAttribute("aria-label",d.msg); c.append(inp); }
-    const ft=document.createElement("div"); ft.className="ssdlg-ft";
-    const yes=document.createElement("button"); yes.type="button"; yes.className="ssdlg-b yes"; yes.textContent=d.opt.ok||(d.type==="alert"?"好":"確定");
-    let no=null;
-    if(d.type!=="alert"){ no=document.createElement("button"); no.type="button"; no.className="ssdlg-b no"; no.textContent=d.opt.cancel||"取消"; ft.append(no); }
-    ft.append(yes); c.append(ft); o.append(c); document.body.append(o);
-    requestAnimationFrame(()=>o.classList.add("on"));
-    setTimeout(()=>{ if(inp){inp.focus();inp.select();} else if(no&&kind==="danger") no.focus(); else yes.focus(); },30);
-    function done(v){
-      document.removeEventListener("keydown",key,true); o.classList.remove("on");
-      setTimeout(()=>{ o.remove(); busy=false; try{last&&last.focus&&last.focus();}catch(e){} d.res(v); run(); },180);
-    }
-    const okV=()=>d.type==="prompt"?inp.value:true, noV=d.type==="prompt"?null:(d.type==="alert"?true:false);
-    yes.onclick=()=>done(okV()); if(no)no.onclick=()=>done(noV);
-    o.addEventListener("mousedown",e=>{ if(e.target===o) done(noV); });
-    function key(e){
-      if(e.key==="Escape"){e.preventDefault();e.stopPropagation();done(noV);}
-      else if(e.key==="Enter"&&(inp?document.activeElement===inp:document.activeElement!==no)){e.preventDefault();e.stopPropagation();done(okV());}
-      else if(e.key==="Tab"){ const f=[inp,no,yes].filter(Boolean), i=f.indexOf(document.activeElement);
-        e.preventDefault(); f[(i+(e.shiftKey?-1:1)+f.length)%f.length].focus(); }
-    }
-    document.addEventListener("keydown",key,true);
-  }
-  function open(type,msg,def,opt){ return new Promise(res=>{ q.push({type,msg:String(msg==null?"":msg),def,opt:opt||{},res}); run(); }); }
-  window.ssAlert=(msg,opt)=>open("alert",msg,null,opt);
-  window.ssConfirm=(msg,opt)=>open("confirm",msg,null,opt);
-  window.ssPrompt=(msg,def,opt)=>open("prompt",msg,def,opt);
-})();
-</script>
 </head>
 <body>
 <div id="nojsTip" role="alert">
@@ -2536,238 +2455,6 @@ function voiceCardRender(){
   },900));
 })();
 </script>
-<script id="ssAiTts">
-/* ══════════ AI 真人語音（Kokoro-82M，在瀏覽器裡執行）══════════
-   英文朗讀改用 AI 語音；中文、單一字母、AI 尚未下載完成或失敗時，自動改用裝置內建語音。
-   接在原本的 speechSynthesis 相容層外面，全站所有 speak()／speakThen()／跟讀都不用改。 */
-(function(){
-  if(!("speechSynthesis" in window)||typeof SpeechSynthesisUtterance==="undefined")return;
-  const LIB="https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js";
-  const MODEL="onnx-community/Kokoro-82M-v1.0-ONNX";
-  const AI_KEY="ss_ai", AIV_KEY="ss_ai_voice";
-  const VOICES={
-    us:[["af_heart","Heart・女聲（推薦）"],["af_bella","Bella・女聲"],["am_michael","Michael・男聲"],["am_fenrir","Fenrir・男聲"]],
-    gb:[["bf_emma","Emma・女聲（推薦）"],["bm_george","George・男聲"],["bm_fable","Fable・男聲"]]
-  };
-  const AI={state:"idle",pct:0,err:"",where:""};
-  const acc=()=>(typeof voiceAccent==="function"?voiceAccent():"us");
-  function aiOn(){ try{ return localStorage.getItem(AI_KEY)!=="0"; }catch(e){ return true; } }
-  function aiVoice(){ const L=VOICES[acc()]||VOICES.us; let v=""; try{ v=localStorage.getItem(AIV_KEY+"_"+acc())||""; }catch(e){} return L.some(x=>x[0]===v)?v:L[0][0]; }
-  const live=()=>aiOn()&&AI.state==="ready";
-
-  /* ── 模型載入：優先放在背景執行緒（畫面不卡），不行就在主執行緒 ── */
-  let W=null, M=null, files={}, lastR=0;
-  const waiters=new Map(); let rid=0;
-  function progress(p){
-    if(!p||!p.file)return;
-    if(p.status==="progress"||p.status==="done"){ const f=files[p.file]||(files[p.file]={l:0,t:0});
-      if(p.total)f.t=p.total; f.l=p.status==="done"?(f.t||f.l):(p.loaded||0); }
-    let l=0,t=0; for(const k in files){ l+=files[k].l; t+=files[k].t; }
-    AI.pct=t?Math.min(99,Math.floor(l/t*100)):0;
-    const now=Date.now(); if(now-lastR>400){ lastR=now; aiStat(); }
-  }
-  function ready(where){ AI.state="ready"; AI.where=where; AI.pct=100; aiStat(true);
-    need("Hello.",aiVoice(),1).catch(()=>{});                 /* 暖機：第一次發音更快 */
-    try{ if(!sessionStorage.getItem("ss_ai_hi")){ sessionStorage.setItem("ss_ai_hi","1"); if(typeof toast==="function")toast("🎙️ <b>AI 真人語音</b>準備好了！英文朗讀已改用 AI 聲音。",4200); } }catch(e){}
-  }
-  function fail(err){ AI.state="fail"; AI.err=String(err||"").slice(0,160); aiStat(true); }
-  function loadMain(){
-    import(LIB).then(K=>K.KokoroTTS.from_pretrained(MODEL,{dtype:"q8",device:"wasm",progress_callback:progress}))
-      .then(t=>{ M=t; ready("main"); }).catch(fail);
-  }
-  const WSRC='let tts=null;self.onmessage=async e=>{const m=e.data;'+
-    'if(m.type==="load"){try{const K=await import(m.lib);tts=await K.KokoroTTS.from_pretrained(m.model,{dtype:"q8",device:"wasm",progress_callback:p=>{try{self.postMessage({type:"progress",p:{status:p.status,file:p.file,loaded:p.loaded,total:p.total}})}catch(_){}}});self.postMessage({type:"ready"})}catch(err){self.postMessage({type:"fail",err:String(err&&err.message||err)})}}'+
-    'else if(m.type==="gen"){try{const a=await tts.generate(m.text,{voice:m.voice,speed:m.speed});const pcm=new Float32Array(a.audio);self.postMessage({type:"audio",id:m.id,pcm:pcm,sr:a.sampling_rate},[pcm.buffer])}catch(err){self.postMessage({type:"gerr",id:m.id,err:String(err&&err.message||err)})}}};';
-  function aiLoad(){
-    if(AI.state==="loading"||AI.state==="ready")return;
-    AI.state="loading"; AI.pct=0; AI.err=""; files={}; aiStat(true);
-    let ok=false;
-    try{
-      W=new Worker(URL.createObjectURL(new Blob([WSRC],{type:"text/javascript"})),{type:"module"});
-      const fallback=why=>{ if(ok)return; ok=true; try{W.terminate();}catch(e){} W=null; files={}; loadMain(); };
-      W.onerror=()=>fallback("worker");
-      W.onmessage=e=>{ const m=e.data||{};
-        if(m.type==="progress")progress(m.p);
-        else if(m.type==="ready"){ ok=true; ready("worker"); }
-        else if(m.type==="fail"){ if(!ok){ fallback(m.err); } }
-        else if(m.type==="audio"||m.type==="gerr"){ const w=waiters.get(m.id); if(!w)return; waiters.delete(m.id);
-          if(m.type==="audio")w.res({pcm:m.pcm,sr:m.sr}); else w.rej(new Error(m.err)); }
-      };
-      W.postMessage({type:"load",lib:LIB,model:MODEL});
-    }catch(e){ W=null; loadMain(); }
-  }
-  function rawGen(text,voice,speed){
-    if(W)return new Promise((res,rej)=>{ const id=++rid; waiters.set(id,{res,rej}); W.postMessage({type:"gen",id,text,voice,speed});
-      setTimeout(()=>{ if(waiters.has(id)){ waiters.delete(id); rej(new Error("timeout")); } },45000); });
-    if(M)return M.generate(text,{voice,speed}).then(a=>({pcm:a.audio,sr:a.sampling_rate}));
-    return Promise.reject(new Error("not ready"));
-  }
-
-  /* ── 產生語音：依序排隊、同一句只做一次、做好的放快取 ── */
-  const cache=new Map(); let cacheN=0; const CAP=6e6;
-  const genQ=[]; let genBusy=false; const inflight=new Map();
-  function need(text,voice,speed){
-    const key=voice+"|"+speed+"|"+text;
-    if(cache.has(key)){ const v=cache.get(key); cache.delete(key); cache.set(key,v); return Promise.resolve(v); }
-    if(inflight.has(key))return inflight.get(key).p;
-    const job={key,text,voice,speed}; job.p=new Promise((res,rej)=>{ job.res=res; job.rej=rej; });
-    inflight.set(key,job); genQ.push(job); pumpGen(); return job.p;
-  }
-  function pumpGen(){
-    if(genBusy||!genQ.length)return; genBusy=true; const j=genQ.shift();
-    rawGen(j.text,j.voice,j.speed).then(r=>{
-      cache.set(j.key,r); cacheN+=r.pcm.length;
-      while(cacheN>CAP&&cache.size>1){ const k=cache.keys().next().value; cacheN-=cache.get(k).pcm.length; cache.delete(k); }
-      j.res(r);
-    },j.rej).finally(()=>{ inflight.delete(j.key); genBusy=false; pumpGen(); });
-  }
-  function dropPending(){ while(genQ.length){ const j=genQ.shift(); inflight.delete(j.key); j.rej(new Error("canceled")); } }
-
-  /* ── 播放：Web Audio（第一次點畫面時解鎖；iPhone 靜音鍵下也出聲） ── */
-  let AC=null;
-  function ac(){ if(!AC){ const C=window.AudioContext||window.webkitAudioContext; if(C){ try{ AC=new C(); }catch(e){} } } return AC; }
-  try{ if(navigator.audioSession)navigator.audioSession.type="playback"; }catch(e){}
-  const unlock=()=>{ const c=ac(); if(!c||c.state==="running")return; c.resume().catch(()=>{});
-    try{ const b=c.createBuffer(1,1,22050), s=c.createBufferSource(); s.buffer=b; s.connect(c.destination); s.start(0); }catch(e){} };
-  ["pointerdown","touchend","keydown","click"].forEach(t=>document.addEventListener(t,unlock,{capture:true,passive:true}));
-
-  function fire(u,type,x){
-    let e; const o=Object.assign({utterance:u,charIndex:0,charLength:0,elapsedTime:0,name:"word"},x||{});
-    try{ e=new SpeechSynthesisEvent(type,o); }catch(_){ e=new Event(type); for(const k in o){ try{ Object.defineProperty(e,k,{value:o[k]}); }catch(__){} } }
-    try{ u.dispatchEvent(e); }catch(_){ const h=u["on"+type]; if(typeof h==="function")try{ h.call(u,e); }catch(__){} }
-  }
-  /* 把文字切成句子（長文邊做邊唸，不用等全部做完） */
-  function chunks(t){
-    if(t.length<=180)return [{s:t,o:0}];
-    const out=[]; const re=/[^.!?;:\n]+[.!?;:\n]*\s*/g; let m, buf="", bo=0;
-    while((m=re.exec(t))){ if(buf&&buf.length+m[0].length>180){ out.push({s:buf,o:bo}); buf=""; } if(!buf)bo=m.index; buf+=m[0];
-      while(buf.length>260){ let cut=buf.lastIndexOf(", ",220); if(cut<60)cut=buf.lastIndexOf(" ",220); if(cut<60)cut=220; out.push({s:buf.slice(0,cut+1),o:bo}); bo+=cut+1; buf=buf.slice(cut+1); } }
-    if(buf.trim())out.push({s:buf,o:bo});
-    return out.filter(c=>c.s.trim());
-  }
-  const useAI=u=>{
-    const t=String(u.text||"").trim(), L=String(u.lang||"");
-    if(L&&!/^en/i.test(L))return false;
-    if(!/[a-z]{2,}/i.test(t)||t.length>3000)return false;          /* 單一字母、符號 → 內建語音 */
-    if(/[　-鿿＀-￯ɐ-˿]/.test(t))return false;  /* 中文、音標符號 → 內建語音 */
-    return true;
-  };
-
-  const prevSpeak=speechSynthesis.speak, prevCancel=speechSynthesis.cancel;
-  const Q=[]; let cur=null, gen=0, src=null, timers=[];
-  function stopAudio(){ timers.forEach(clearTimeout); timers=[]; if(src){ try{ src.onended=null; src.stop(); }catch(e){} src=null; } }
-  function playPCM(r,vol,g,onWords){
-    return new Promise(res=>{
-      const c=ac(); if(!c||c.state!=="running")return res(false);
-      const b=c.createBuffer(1,r.pcm.length,r.sr); b.getChannelData(0).set(r.pcm);
-      const s=c.createBufferSource(); s.buffer=b; const gn=c.createGain(); gn.gain.value=vol==null?1:vol;
-      s.connect(gn); gn.connect(c.destination); src=s;
-      s.onended=()=>{ if(src===s)src=null; res(true); };
-      s.start(); if(onWords)onWords(b.duration);
-    });
-  }
-  function words(text,off,dur,u,g){
-    const re=/\S+/g; let m, W=[], tot=0; while((m=re.exec(text))){ W.push([m.index,m[0].length]); tot+=m[0].length+1; }
-    let acc=0; W.forEach(([i,n])=>{ const at=acc/tot*dur*1000; acc+=n+1;
-      timers.push(setTimeout(()=>{ if(g===gen)fire(u,"boundary",{charIndex:off+i,charLength:n,elapsedTime:at/1000}); },at)); });
-  }
-  async function playAI(u,g){
-    const voice=aiVoice(), speed=Math.max(0.5,Math.min(1.6,+u.rate||1));
-    const parts=chunks(String(u.text)); parts.forEach(p=>p.p=need(p.s.trim(),voice,speed)); parts.forEach(p=>p.p.catch(()=>{}));
-    let started=false;
-    for(const p of parts){
-      let r; try{ r=await p.p; }catch(e){ if(g!==gen)return; if(!started)return playNative(u,g); break; }
-      if(g!==gen)return;
-      const c=ac(); if(c&&c.state!=="running"){ try{ await Promise.race([c.resume(),new Promise(z=>setTimeout(z,300))]); }catch(e){} }
-      if(!c||c.state!=="running"){ if(!started)return playNative(u,g); break; }   /* 還沒點過畫面、無法自動播放 → 內建語音 */
-      if(!started){ started=true; fire(u,"start"); }
-      await playPCM(r,u.volume,g,d=>words(p.s,p.o,d,u,g));
-      if(g!==gen)return;
-    }
-    if(g===gen)fire(u,"end",{charIndex:String(u.text).length,elapsedTime:0});
-  }
-  function playNative(u,g){
-    return new Promise(res=>{
-      let done=false; const fin=()=>{ if(done)return; done=true; clearTimeout(t); res(); };
-      const oe=u.onend, or=u.onerror;
-      u.onend=function(e){ if(oe)oe.call(this,e); fin(); };
-      u.onerror=function(e){ if(or)or.call(this,e); else if(oe)oe.call(this,e); fin(); };
-      const t=setTimeout(fin,Math.max(4000,String(u.text).length*160/(+u.rate||1)+3000));
-      try{ prevSpeak.call(speechSynthesis,u); }catch(e){ fin(); }
-    });
-  }
-  async function pump(){
-    if(cur||!Q.length)return;
-    const g=gen; cur=Q.shift();
-    try{ if(cur.ai)await playAI(cur.u,g); else await playNative(cur.u,g); }catch(e){}
-    if(g!==gen)return;
-    cur=null; pump();
-  }
-  speechSynthesis.speak=function(u){
-    if(!u)return;
-    if(!live()&&!cur&&!Q.length)return prevSpeak.call(speechSynthesis,u);   /* AI 未就緒：照舊 */
-    const item={u,ai:live()&&useAI(u)};
-    if(item.ai){ const v=aiVoice(),sp=Math.max(0.5,Math.min(1.6,+u.rate||1)); chunks(String(u.text)).slice(0,1).forEach(p=>need(p.s.trim(),v,sp).catch(()=>{})); }
-    Q.push(item); pump();
-  };
-  speechSynthesis.cancel=function(){
-    gen++; Q.length=0; cur=null; stopAudio(); dropPending();
-    return prevCancel.call(speechSynthesis);
-  };
-  try{
-    const P=Object.getPrototypeOf(speechSynthesis), d=Object.getOwnPropertyDescriptor(P,"speaking");
-    if(d&&d.get)Object.defineProperty(speechSynthesis,"speaking",{configurable:true,get(){ return !!cur||Q.length>0||d.get.call(speechSynthesis); }});
-  }catch(e){}
-
-  /* ── 學習護照「語音設定」卡：加上 AI 語音區塊 ── */
-  function statText(){
-    if(!aiOn())return "已關閉，英文使用下方的裝置內建語音。";
-    if(AI.state==="ready")return "✅ 已就緒，英文朗讀使用 AI 真人語音。";
-    if(AI.state==="loading")return "⏳ 正在下載 AI 語音模型… "+AI.pct+"%（約 90MB，下載完成前先用內建語音）";
-    if(AI.state==="fail")return "⚠️ AI 語音載入失敗，暫時使用內建語音。請確認網路後再試一次。";
-    return "尚未下載。按「下載 AI 語音」開始（約 90MB，建議用 Wi-Fi）。";
-  }
-  function aiStat(full){
-    if(full&&typeof voiceCardRender==="function"&&document.getElementById("voiceCard")){ voiceCardRender(); return; }
-    const el=document.getElementById("aiStat"); if(el)el.textContent=statText();
-    const bar=document.getElementById("aiBar"); if(bar)bar.style.width=AI.pct+"%";
-  }
-  if(typeof voiceCardRender==="function"){
-    const base=voiceCardRender;
-    voiceCardRender=function(){
-      base.apply(this,arguments);
-      const c=document.getElementById("voiceCard"); if(!c)return;
-      const h=c.querySelector("h2"); if(!h)return;
-      const on=aiOn(), L=VOICES[acc()]||VOICES.us, v=aiVoice();
-      const box=document.createElement("div"); box.className="aibox"; box.id="aiBox";
-      box.innerHTML='<div class="aihd"><b>🎙️ AI 真人語音（英文）</b><label class="aisw"><input type="checkbox" id="aiOn"'+(on?" checked":"")+'><span>'+(on?"使用中":"已關閉")+'</span></label></div>'+
-        '<p class="count" id="aiStat" style="margin:6px 0 0">'+statText()+'</p>'+
-        (on&&AI.state==="loading"?'<div class="aiprog"><i id="aiBar" style="width:'+AI.pct+'%"></i></div>':'')+
-        (on?'<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px">'+
-          '<select id="aiVoice" aria-label="選擇 AI 英文語音" style="flex:1;min-width:200px;font:inherit;padding:9px 10px;border-radius:12px;border:1.5px solid var(--cream2);background:var(--paper);color:var(--ink)">'+
-          L.map(x=>'<option value="'+x[0]+'"'+(x[0]===v?" selected":"")+'>'+(acc()==="gb"?"🇬🇧 ":"🇺🇸 ")+x[1]+'</option>').join("")+'</select>'+
-          (AI.state==="ready"?'<button class="btn b" id="aiTry">▶ 試聽 AI 語音</button>':'')+
-          (AI.state==="idle"||AI.state==="fail"?'<button class="btn b" id="aiLoad">'+(AI.state==="fail"?"🔄 重新下載":"⬇ 下載 AI 語音")+'</button>':'')+
-        '</div>':'')+
-        '<p class="count" style="margin:10px 0 0">AI 語音（Kokoro）在你的瀏覽器裡執行，不用帳號、不上傳文字。第一次要下載約 90MB，之後瀏覽器會記住。中文朗讀、單一字母，以及 AI 語音準備好之前，都會改用下方的裝置內建語音。</p>';
-      (c.querySelector(".vacc")||h).insertAdjacentElement("afterend",box);
-      const sub=document.createElement("p"); sub.className="count"; sub.style.cssText="margin:14px 0 0;font-weight:700;color:var(--ink)"; sub.textContent="🔈 裝置內建語音";
-      box.insertAdjacentElement("afterend",sub);
-      const cb=box.querySelector("#aiOn"); cb.onchange=()=>{ try{ localStorage.setItem(AI_KEY,cb.checked?"1":"0"); }catch(e){} speechSynthesis.cancel(); if(cb.checked&&AI.state==="idle")aiLoad(); voiceCardRender(); };
-      const sel=box.querySelector("#aiVoice"); if(sel)sel.onchange=()=>{ try{ localStorage.setItem(AIV_KEY+"_"+acc(),sel.value); }catch(e){} if(live()&&typeof speak==="function")speak("Hi! I'm your English reading buddy.",0.9); };
-      const tr=box.querySelector("#aiTry"); if(tr)tr.onclick=()=>{ if(typeof speak==="function")speak(acc()==="gb"?"Practice makes progress! Shall we learn some English together?":"Practice makes progress! Let's learn English together.",0.9); };
-      const ld=box.querySelector("#aiLoad"); if(ld)ld.onclick=()=>aiLoad();
-    };
-  }
-  window.ssAI={load:aiLoad,state:()=>Object.assign({},AI),on:aiOn};
-
-  /* 開頁後自動在背景下載（省流量模式除外） */
-  function auto(){ if(!aiOn())return; const cn=navigator.connection; if(cn&&cn.saveData)return; aiLoad(); }
-  const kick=()=>setTimeout(()=>{ if(window.requestIdleCallback)requestIdleCallback(auto,{timeout:4000}); else auto(); },2500);
-  if(document.readyState==="complete")kick(); else window.addEventListener("load",kick);
-})();
-</script>
-
 <script>
 /* ══ KK 音標顯示：字庫存的是 IPA（對位、音節計算都靠它），顯示時一律轉成台灣通用的 KK ══ */
 function kkP(t){
@@ -16240,11 +15927,11 @@ document.getElementById("imp").onclick=()=>{
     S=normS(o);
     PS=new Set(S.prod);RS=new Set(S.recv);DS=new Set(S.dict);
     save(); pi=ri=di=0; drawProd();drawRecv();drawDict();drawPass();drawMap();refreshMe();
-    t.style.display="none"; ssAlert("你的練習進度已經匯入完成。",{kind:"ok",title:"匯入成功"});
-  }catch(e){ ssAlert("格式不對，請確認貼上的是完整的匯出字串。",{kind:"warn",title:"無法匯入"}); }
+    t.style.display="none"; alert("匯入成功。");
+  }catch(e){ alert("格式不對，請確認貼上的是完整的匯出字串。"); }
 };
-document.getElementById("reset").onclick=async()=>{
-  if(await ssConfirm("清除這台裝置上的所有練習進度？此動作無法復原。",{kind:"danger",title:"清除所有進度",ok:"清除"})){
+document.getElementById("reset").onclick=()=>{
+  if(confirm("清除這台裝置上的所有練習進度？此動作無法復原。")){
     S=defS();save();
     PS=new Set();RS=new Set();DS=new Set();
     pi=0;ri=0;di=0;drawProd();drawRecv();drawDict();drawPass();drawMap();refreshMe();
@@ -18056,10 +17743,10 @@ function drawRadar(){
   }else{
     box.querySelector("#cSave").onclick=()=>{
       const src=box.querySelector("#cSrc").value.trim()||("句庫 "+(S.corpus.length+1)), s=splitSents(box.querySelector("#cTxt").value);
-      if(!s.length){ssAlert("沒有切出任何英文句子，請確認貼上的是英文文字。",{kind:"warn"});return;}
+      if(!s.length){alert("沒有切出任何英文句子，請確認貼上的是英文文字。");return;}
       S.corpus.push({src:src,s:s}); save(); drawRadar(); toast("📚 已加入〈"+esc(src)+"〉共 "+s.length+" 句");
     };
-    box.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{if(await ssConfirm("刪除這份句庫？",{kind:"danger",ok:"刪除"})){S.corpus.splice(+b.dataset.del,1);save();drawRadar();}});
+    box.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(confirm("刪除這份句庫？")){S.corpus.splice(+b.dataset.del,1);save();drawRadar();}});
   }
 }
 const STOP=new Set("i me my you your he him his she her it its we us our they them their a an the and or but if of to in on at by for with from as is am are was were be been being do does did have has had this that these those there here not no yes so than then too very can could will would shall should may might must".split(" "));
@@ -18092,7 +17779,7 @@ function scanText(){
   out.querySelectorAll("[data-l]").forEach(s=>s.onclick=()=>{rdWord=LOW.get(s.dataset.l.toLowerCase());rdTab="w";drawRadar();window.scrollTo({top:0,behavior:"smooth"});});
   out.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{rdWord=LOW.get(b.dataset.w.toLowerCase());rdTab="w";drawRadar();window.scrollTo({top:0,behavior:"smooth"});});
   const all=out.querySelector("#rdAll"); if(all)all.onclick=()=>{hi.forEach(o=>{if(!S.mylist.includes(o.x.w))S.mylist.push(o.x.w);});save();toast("已加入 "+hi.length+" 字到「我的清單」— 可以在拼字解碼、段考生存裡使用");};
-  const sv=out.querySelector("#rdSave"); if(sv)sv.onclick=async()=>{let src=await ssPrompt("幫這篇取個出處標籤（例：113 學測閱讀測驗）","我的文章 "+(S.corpus.length+1),{title:"存入句庫",ok:"存入"}); src=src&&src.trim(); if(!src)return; const s=splitSents(rdText); if(!s.length)return; S.corpus.push({src:src,s:s});save();toast("📚 已存入句庫："+s.length+" 句");};
+  const sv=out.querySelector("#rdSave"); if(sv)sv.onclick=()=>{const src=prompt("幫這篇取個出處標籤（例：113 學測閱讀測驗）","我的文章 "+(S.corpus.length+1)); if(!src)return; const s=splitSents(rdText); if(!s.length)return; S.corpus.push({src:src,s:s});save();toast("📚 已存入句庫："+s.length+" 句");};
 }
 
 /* ══════════ 國中銜接模式 ══════════ */
@@ -18205,7 +17892,7 @@ function drawSurv(){
 }
 function svStart(words,wrongMode){
   const P=words.map(w=>LOW.get(w)).filter(Boolean);
-  if(P.length<4){ssAlert("範圍至少要 4 個字。",{kind:"warn"});return;}
+  if(P.length<4){alert("範圍至少要 4 個字。");return;}
   SV={on:true,P:P,deck:shuffle(P),hearts:3,streak:0,score:0,q:null,wrongMode:!!wrongMode,newT:[],ans:false};
   S.surv.runs++; save(); svNextQ();
 }
@@ -18339,7 +18026,7 @@ function drawTurf(){
     if(!L.length){$("tMsg").textContent="沒有讀到有效的戰報碼（開頭應該是 SS1-）。";return;}
     L.forEach(o=>{const i=S.hub.findIndex(h=>h.n===o.n&&h.s===o.s); if(i>=0){if(S.hub[i].t<o.t)S.hub[i]=o;} else S.hub.push(o);});
     save(); drawTurf(); $("tMsg").textContent="匯入 "+L.length+" 筆戰報。";};
-  box.querySelector("#tClr").onclick=async()=>{if(await ssConfirm("清空戰情總部收到的所有戰報？（不影響你自己的進度）",{kind:"danger",ok:"清空"})){S.hub=[];save();drawTurf();}};
+  box.querySelector("#tClr").onclick=()=>{if(confirm("清空戰情總部收到的所有戰報？（不影響你自己的進度）")){S.hub=[];save();drawTurf();}};
   bindTwMap(box,A);
 }
 
@@ -18481,10 +18168,8 @@ function speakThen(t,rate,cb){
   let done=false; const fin=()=>{if(done)return;done=true;if(cb)cb();};
   u.onend=fin; u.onerror=fin;
   _u.push(u); if(_u.length>12)_u.shift();
-  const lim=1500+t.length*110/(rate||0.9); let tm=0;
-  u.addEventListener("start",()=>{ clearTimeout(tm); tm=setTimeout(fin,lim); });
   speechSynthesis.speak(u);
-  tm=setTimeout(fin, lim+(window.ssAI&&ssAI.on()&&ssAI.state().state==="ready"?8000:0));   /* 某些瀏覽器不觸發 onend 的保險（AI 語音要多等產生時間） */
+  setTimeout(fin, 1500+t.length*110/(rate||0.9));   /* 某些瀏覽器不觸發 onend 的保險 */
 }
 function playRec(key,cb){
   const url=RECS[key]; if(!url){if(cb)cb();return;}
@@ -19529,8 +19214,8 @@ function pDrawSec(el,y,sec,st){
   el.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>pSpeakGroup(y,sec,sec.groups[+b.dataset.say],b));
   el.querySelectorAll("[data-self]").forEach(b=>b.onclick=()=>{st.self[b.dataset.self]=+b.dataset.v;save();drawPast();});
   el.querySelectorAll("[data-show]").forEach(b=>b.onclick=()=>{st.chk["w_"+b.dataset.show]=true;save();drawPast();});
-  const ck=el.querySelector("#pChk"); if(ck)ck.onclick=async()=>{
-    const s0=pScoreSec(y,sec.id); if(s0.done<s0.tot&&!(await ssConfirm("還有 "+(s0.tot-s0.done)+" 題沒作答，確定要對答案嗎？",{kind:"warn",title:"還沒寫完",ok:"對答案",cancel:"繼續作答"})))return;
+  const ck=el.querySelector("#pChk"); if(ck)ck.onclick=()=>{
+    const s0=pScoreSec(y,sec.id); if(s0.done<s0.tot&&!confirm("還有 "+(s0.tot-s0.done)+" 題沒作答，確定要對答案嗎？"))return;
     st.chk[sec.id]=true; save(); pAfterCheck(y,sec,st); drawPast(); };
   const rd=el.querySelector("#pRedo"); if(rd)rd.onclick=()=>{ pQs(sec).forEach(q=>delete st.ans[q.n]); delete st.chk[sec.id]; pQs(sec).forEach(q=>delete st.self["m"+q.n]); save(); pAct=null; drawPast(); };
   const wc=el.querySelector('textarea[data-w="essay"]'); if(wc){ const cnt=el.querySelector("#pWC"); const upd=()=>{const n=(wc.value.match(/[A-Za-z’'-]+/g)||[]).length; cnt.textContent=n+" 個單詞"+(n<120?"（至少 120）":" ✓");}; wc.addEventListener("input",upd); upd(); }
