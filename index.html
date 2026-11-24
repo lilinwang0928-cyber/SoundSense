@@ -2569,7 +2569,7 @@ window.SSA_SILENT="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLj
    所有朗讀仍經過 speechSynthesis.speak，頁面原本的 onstart／onend 照常觸發。 */
 const SSA=(function(){
   const IDX=window.SSA_IDX||{}, AKEY="ss_aiaudio";
-  const bufs={}, abufs={}, urls={}; let el=null, Q=[], busy=false, gen=0, fails=0, unlocked=false, ctx=null, src=null;
+  const bufs={}, abufs={}, urls={}, bad={}; let el=null, Q=[], busy=false, gen=0, fails=0, unlocked=false, ctx=null, src=null;
   const offline=location.protocol==="file:";
   const st={ok:0,err:"",how:""};
   function on(){ try{ return localStorage.getItem(AKEY)!=="0"; }catch(e){ return true; } }
@@ -2579,12 +2579,16 @@ const SSA=(function(){
     if(!u||!on()||!avail())return false;
     if(!/^en/i.test(u.lang||"en-US"))return false;
     if(typeof voiceAccent==="function"&&voiceAccent()==="gb")return false;
-    return !!IDX[u.text];
+    const e=IDX[u.text]; return !!e&&!bad[e[0]];
   }
   function file(b){ return "audio/"+((window.SSA_FILES&&window.SSA_FILES[b])||("en_"+b+".mp3")); }
   function load(b){
-    if(!bufs[b])bufs[b]=fetch(file(b)).then(r=>{ if(!r.ok)throw new Error("HTTP "+r.status); return r.arrayBuffer(); })
-      .catch(e=>{ delete bufs[b]; fails++; st.err="讀不到錄音資料夾（"+(e&&e.message||e)+"）"; throw e; });
+    if(!bufs[b])bufs[b]=fetch(file(b)).then(r=>{ if(!r.ok){ const er=new Error("HTTP "+r.status); er.http=r.status; throw er; } return r.arrayBuffer(); })
+      .catch(e=>{ delete bufs[b];
+        /* 單一檔案不存在（例如網頁和 audio 資料夾版本沒對上）：只停用這個檔，其他錄音照常；這個檔的字改用瀏覽器語音 */
+        if(e&&e.http>=400&&e.http<500){ bad[b]=true; st.err="找不到錄音檔 "+file(b)+"（請確認 audio 資料夾已上傳最新檔案）"; }
+        else { fails++; st.err="讀不到錄音資料夾（"+(e&&e.message||e)+"）"; }
+        throw e; });
     return bufs[b];
   }
   function getCtx(){ try{ if(!ctx){ const C=window.AudioContext||window.webkitAudioContext; if(C)ctx=new C(); } if(ctx&&ctx.state==="suspended")ctx.resume(); }catch(e){} return ctx; }
@@ -17591,7 +17595,7 @@ function analyzeOnset(x,sr){
   { const m=rawMax;
     if(m>1e-4&&m<0.6){ const g=0.6/m, y=new Float32Array(x.length); for(let i=0;i<x.length;i++)y[i]=x[i]*g; x=y; } }
   const {F,ms}=feats(x,sr);
-  if(F.length<20)return {ok:false,why:"錄音太短"};
+  if(F.length<20)return {ok:false,why:"沒有錄到完整的聲音（手機的音訊可能被示範音或其他 App 打斷了）。請再按一次麥克風；如果一直出現，請重新整理頁面"};
   const Es=F.map(f=>f.E), peak=Math.max(...Es), floor0=Math.max(pct(Es,0.15),1e-12);
   /* 真的沒聲音：最大音量低於約 -54 dBFS，且幾乎沒有起伏 */
   if(rawMax<0.002||(peak<4e-6&&peak<floor0*8))return {ok:false,why:"幾乎沒有收到聲音，請靠近麥克風再唸一次"};
@@ -17630,7 +17634,12 @@ function liveFrame(buf,sr){
 /* ══════════ 麥克風 ══════════ */
 const MIC={st:null,src:null,an:null,pr:null,g:null,rec:false,buf:[],raf:0,floor:0.002};
 async function micOpen(){
-  if(MIC.st)return true;
+  if(MIC.st){
+    /* iPhone：播放示範音、切換 App 或來電後，麥克風軌道可能已結束、音訊引擎被「中斷」——重新接上 */
+    const tr=MIC.st.getAudioTracks()[0];
+    if(tr&&tr.readyState==="live"&&MIC.pr){ try{ const A=ac(); if(A.state!=="running")await A.resume(); }catch(e){} return true; }
+    micClose();
+  }
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){labMsg('這個瀏覽器不能使用麥克風。請用 Chrome、Edge 或 Safari 開啟（iPhone 需 iOS 14.3 以上）。');return false;}
   try{
     MIC.st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
@@ -17653,9 +17662,35 @@ function micClose(){
   try{MIC.src&&MIC.src.disconnect();MIC.pr&&MIC.pr.disconnect();MIC.g&&MIC.g.disconnect();}catch(e){}
   MIC.st=null;MIC.src=null;MIC.an=null;MIC.pr=null;MIC.rec=false;
 }
+/* 錄一段聲音。主要用 ScriptProcessor 收樣本；同時開 MediaRecorder 當備援——
+   iPhone Safari 有時音訊引擎被中斷、ScriptProcessor 收不到樣本（畫面就會誤判「錄音太短」），
+   這時改把 MediaRecorder 錄到的檔案解碼回波形來分析。 */
 function micRecord(sec){
-  return new Promise(res=>{MIC.buf=[];MIC.rec=true;
-    setTimeout(()=>{MIC.rec=false;const n=MIC.buf.reduce((a,b)=>a+b.length,0),x=new Float32Array(n);let o=0;MIC.buf.forEach(b=>{x.set(b,o);o+=b.length;});res(x);},sec*1000);});
+  return new Promise(async res=>{
+    const A=ac(); try{ if(A.state!=="running")await A.resume(); }catch(e){}
+    MIC.buf=[]; MIC.rec=true;
+    let mr=null; const chunks=[];
+    try{ if(window.MediaRecorder&&MIC.st){ mr=new MediaRecorder(MIC.st); mr.ondataavailable=e=>{ if(e.data&&e.data.size)chunks.push(e.data); }; mr.start(); } }catch(e){ mr=null; }
+    setTimeout(async()=>{
+      MIC.rec=false;
+      const n=MIC.buf.reduce((a,b)=>a+b.length,0), x=new Float32Array(n); let o=0; MIC.buf.forEach(b=>{x.set(b,o);o+=b.length;});
+      MIC.lastVia="sp";
+      if(mr){
+        const stopped=new Promise(r=>{ mr.onstop=r; });
+        try{ if(mr.state!=="inactive")mr.stop(); }catch(e){}
+        if(n<sec*A.sampleRate*0.6){
+          try{
+            await Promise.race([stopped,new Promise(r=>setTimeout(r,1500))]);
+            const blob=new Blob(chunks,{type:mr.mimeType||"audio/mp4"}), ab=await blob.arrayBuffer();
+            const dec=await new Promise((ok,no)=>{ const p=A.decodeAudioData(ab,ok,no); if(p&&p.then)p.then(ok,no); });
+            const y=dec.getChannelData(0);
+            if(y.length>n){ MIC.lastVia="mr"; res(new Float32Array(y)); return; }
+          }catch(e){}
+        }
+      }
+      res(x);
+    },sec*1000);
+  });
 }
 function micLive(cb){
   cancelAnimationFrame(MIC.raf);
